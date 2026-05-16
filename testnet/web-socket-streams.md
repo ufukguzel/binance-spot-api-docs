@@ -4,6 +4,7 @@
 - [WebSocket Streams for Binance SPOT Testnet](#websocket-streams-for-binance-spot-testnet)
   - [General WSS information](#general-wss-information)
   - [WebSocket Limits](#websocket-limits)
+  - [Server Shutdown](#server-shutdown)
   - [Live Subscribing/Unsubscribing to streams](#live-subscribingunsubscribing-to-streams)
     - [Subscribe to a stream](#subscribe-to-a-stream)
     - [Unsubscribe to a stream](#unsubscribe-to-a-stream)
@@ -15,6 +16,7 @@
   - [Reference Price Streams](#reference-price-streams)
   - [Aggregate Trade Streams](#aggregate-trade-streams)
   - [Trade Streams](#trade-streams)
+  - [Block Trade Streams](#block-trade-streams)
   - [Kline/Candlestick Streams for UTC](#klinecandlestick-streams-for-utc)
   - [Kline/Candlestick Streams with timezone offset](#klinecandlestick-streams-with-timezone-offset)
   - [Individual Symbol Mini Ticker Stream](#individual-symbol-mini-ticker-stream)
@@ -40,6 +42,7 @@
 * Combined stream events are wrapped as follows: **{"stream":"\<streamName\>","data":\<rawPayload\>}**
 * All symbols for streams are **lowercase**
 * A single connection to **stream.testnet.binance.vision** is only valid for 24 hours; expect to be disconnected at the 24 hour mark.
+* A [`serverShutdown`](#serverShutdown) event will be sent 10 minutes before disconnection. Please establish a new connection as soon as possible to prevent interruption.
 * The WebSocket server will send a `ping frame` every 20 seconds.
   * If the WebSocket server does not receive a `pong frame` back from the connection within a minute, the connection will be disconnected.
   * When you receive a ping, you must send a pong with a copy of ping's payload as soon as possible.
@@ -50,7 +53,6 @@
 * If your request contains a symbol name containing non-ASCII characters, then the stream events may contain non-ASCII characters encoded in UTF-8.
 * [All Market Mini Tickers Stream](#all-market-mini-tickers-stream) and [All Market Rolling Window Statistics Streams](#all-market-rolling-window-statistics-streams) events may contain non-ASCII characters encoded in UTF-8.
 
-
 ## WebSocket Limits
 * WebSocket connections have a limit of 5 incoming messages per second. A message is considered:
     * A PING frame
@@ -59,6 +61,33 @@
 * A connection that goes beyond the limit will be disconnected; IPs that are repeatedly disconnected may be banned.
 * A single connection can listen to a maximum of 1024 streams.
 * There is a limit of **300 connections per attempt every 5 minutes per IP**.
+<a id="serverShutdown"></a>
+## Server Shutdown
+
+`serverShutdown` event is sent when the server is about to shut down.
+
+* `raw` stream:
+
+```javascript
+{
+  "e": "serverShutdown", // Event type
+  "E": 1770123456789     // Event time
+}
+```
+
+* `combined` stream:
+
+```javascript
+{
+  "stream": "!serverShutdown",
+  "data: {
+    "e": "serverShutdown", // Event type
+    "E": 1770123456789     // Event time
+  }
+}
+```
+
+Please establish a new connection as soon as possible to prevent interruption.
 
 ## Live Subscribing/Unsubscribing to streams
 
@@ -240,6 +269,26 @@ The Trade Streams push raw trade information; each trade has a unique buyer and 
     "T": 1672515782136,     // Trade time
     "m": true,              // Is the buyer the market maker?
     "M": true               // Ignore
+}
+```
+
+## Block Trade Streams
+
+**Stream Name:** \<symbol\>@blockTrade
+
+**Update Speed:** Real-time
+
+**Payload:**
+```javascript
+{
+  "e": "blockTrade",  // Event type
+  "E": 1772506983582, // Event time
+  "s": "BNBBTC",      // Symbol
+  "t": 582,           // Block Trade ID
+  "p": "0.052",       // Price
+  "q": "5838",        // Quantity
+  "T": 1772506983321, // Trade time
+  "m": true           // Is the buyer the maker?
 }
 ```
 

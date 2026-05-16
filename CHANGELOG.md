@@ -1,6 +1,62 @@
 # CHANGELOG for Binance's API
 
-**Last Updated: 2026-04-17**
+**Last Updated: 2026-05-11**
+
+### 2026-05-11
+
+The following rollout will occur at **approximately 07:00 UTC on 2026-05-12**.
+
+* Added WebSocket Stream support for [Block Trades](https://www.binance.info/en/support/faq/detail/557f95eaf8fb4460aed0a891d42a1425).
+  * New stream:
+    * `<symbol>@blockTrade`
+
+---
+
+### 2026-05-06
+
+**Notice: The following changes will be deployed on 2026-05-08, starting at 06:00 UTC and may take several hours to complete.**
+
+* Added `serverShutdown` event to [WebSocket API](./web-socket-api.md#serverShutdown) and [WebSocket Streams](./web-socket-streams.md#serverShutdown).
+  * `serverShutdown` event will be sent 10 minutes before disconnection.
+
+* [`PERCENT_PRICE`](./filters.md#percent_price), [`PERCENT_PRICE_BY_SIDE`](./filters.md#percent_price_by_side), [`MIN_NOTIONAL`](./filters.md#min_notional), and [`NOTIONAL`](./filters.md#notional) filters now use [reference price](./faqs/price_range_execution_rules.md) when it exists and is non-null. The filters fall back to their previous behavior when the reference price does not exist or is null.
+
+* Market data for [Block Trades](https://www.binance.info/en/support/faq/detail/557f95eaf8fb4460aed0a891d42a1425).
+  * New Endpoints/Methods
+    * REST API:
+      * `GET /api/v3/historicalBlockTrades`
+    * WebSocket API:
+      * `blockTrades.historical`
+
+* Order query responses may include an [`expiryReason`](./enums.md#expiryreasons) field.
+  * This field is returned **only for expired orders** and helps users understand why an order expired, including cases where the order is expired due to the **execution price range rule**.
+  * This field is included in both JSON and SBE 3:4 responses.
+  * This applies to the following endpoint/method:
+    * REST API:
+      * `GET /api/v3/order`
+      * `GET /api/v3/allOrders`
+      * `GET /api/v3/orderList`
+      * `GET /api/v3/allOrderList`
+    * WebSocket API:
+      * `order.status`
+      * `allOrders`
+      * `orderList.status`
+      * `allOrderLists`
+
+* REST and WebSocket API SBE schema 3:4
+  * The current schema 3:3 [spot_3_3.xml](https://github.com/binance/binance-spot-api-docs/blob/master/sbe/schemas/spot_3_3.xml) is deprecated and will be retired in 6 months as per our schema deprecation policy.
+  * Changes in schema 3:4:
+    * New message `BlockTradesResponse`
+    * New type `blockTradeId`
+    * New field `expiryReason` in `OrderResponse` and `OrdersResponse`
+
+---
+
+### 2026-04-28
+
+* Corrected the JSON in the `Price Range Execution Rule FAQ` for the question [`How does the Price Range Execution Rule work?`](./faqs/price_range_execution_rules.md#how-does-the-price-range-execution-rule-work).
+
+---
 
 ### 2026-04-17
 
@@ -9,7 +65,6 @@ The following will occur on **2026-05-05 at approximately 10:00 UTC**.
 * The update speed of the below SBE Market Data Streams will be changed **from 50ms to 25ms**:
   * SBE Market Data Streams: [Diff Depth Streams](sbe-market-data-streams.md#diff-depth-streams)
   * FIX SBE: [MarketDataIncrementalDepth](fix-api.md#marketdataincrementaldepth)
-
 
 ---
 
