@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tradebot — kontrol</title>
+  <style>
+    :root {
+      color-scheme: dark light;
+      --bg: #0f1115;
+      --panel: #171a21;
+      --border: #2a3040;
+      --text: #e8eaed;
+      --muted: #9aa3b2;
+      --accent: #3b82f6;
+      --accent-dim: #2563eb;
+      --danger: #ef4444;
+      --ok: #22c55e;
+      --warn: #f59e0b;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f4f6f9;
+        --panel: #fff;
+        --border: #d8dee9;
+        --text: #1a1d24;
+        --muted: #5c6570;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 28px 20px 48px; }
+    header { margin-bottom: 28px; }
+    h1 { font-size: 1.5rem; font-weight: 650; margin: 0 0 6px; letter-spacing: -0.02em; }
+    .sub { color: var(--muted); font-size: 0.95rem; margin: 0; max-width: 62ch; }
+    section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 18px;
+    }
+    h2 { font-size: 1rem; font-weight: 600; margin: 0 0 14px; }
+    label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; }
+    input[type="password"], input[type="text"], textarea {
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.88rem;
+    }
+    textarea { min-height: 200px; resize: vertical; }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .grow { flex: 1; min-width: 140px; }
+    button {
+      font: inherit;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      cursor: pointer;
+    }
+    button:hover { filter: brightness(1.08); }
+    button.primary {
+      background: var(--accent);
+      border-color: var(--accent-dim);
+      color: #fff;
+    }
+    button.ghost { background: transparent; }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: var(--bg);
+    }
+    .card .k { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 4px; }
+    .card .v { font-size: 0.95rem; font-weight: 600; word-break: break-all; }
+    .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+    .pill.on { background: rgba(34,197,94,0.2); color: var(--ok); }
+    .pill.off { background: rgba(239,68,68,0.15); color: var(--danger); }
+    pre {
+      margin: 0;
+      padding: 14px;
+      border-radius: 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      font-size: 0.78rem;
+      overflow: auto;
+      max-height: 320px;
+    }
+    .muted { color: var(--muted); font-size: 0.88rem; margin: 0 0 12px; }
+    .muted:last-child { margin-bottom: 0; }
+    .ok { color: var(--ok); }
+    .err { color: var(--danger); }
+    .warn { color: var(--warn); }
+    #toast {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      left: 22px;
+      max-width: 420px;
+      margin-left: auto;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+      font-size: 0.9rem;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: 0.22s ease;
+      z-index: 50;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    .linkbox {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+      flex-wrap: wrap;
+    }
+    .linkbox input { flex: 1; min-width: 200px; }
+    a.btnlink { text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Tradebot kontrol</h1>
+      <p class="sub">Strateji (Pine, alarm koşulları) TradingView’dedir. Buradan durum, webhook adresleri ve <strong>runtime</strong> miktar haritasını yönetirsiniz.</p>
+    </header>
+
+    <section>
+      <h2>Panel anahtarı</h2>
+      <label for="token"><code>DASHBOARD_TOKEN</code></label>
+      <div class="row">
+        <input class="grow" id="token" type="password" autocomplete="off" placeholder="Bearer token" />
+        <button type="button" class="ghost" id="btnToggleToken">Göster</button>
+      </div>
+      <p class="muted" style="margin-top:12px">Tarayıcıda <code>sessionStorage</code> ile saklanır. Üretimde güçlü token + mümkünse HTTPS kullanın.</p>
+    </section>
+
+    <section>
+      <h2>Durum</h2>
+      <div class="row" style="margin-bottom:14px">
+        <button class="primary" type="button" id="btnRefresh">Yenile</button>
+        <span id="statusMsg"></span>
+        <span class="muted" id="lastSync" style="margin-left:auto"></span>
+      </div>
+      <div class="cards" id="cards"></div>
+      <div class="row" style="margin-bottom:10px">
+        <button type="button" id="btnToggleRaw">Ham JSON göster / gizle</button>
+      </div>
+      <pre id="statusBox" hidden></pre>
+    </section>
+
+    <section>
+      <h2>Webhook ve sağlık</h2>
+      <p class="muted">TradingView’de URL tam olarak <code>…/tradingview/webhook</code> olmalı; HTTP için port <strong>80</strong> (Nginx).</p>
+      <label>Webhook</label>
+      <div class="linkbox" style="margin-bottom:12px">
+        <input id="webhookUrl" readonly />
+        <button type="button" id="btnCopyWebhook">Kopyala</button>
+      </div>
+      <label>Sağlık</label>
+      <div class="linkbox">
+        <input id="healthUrl" readonly />
+        <button type="button" id="btnCopyHealth">Kopyala</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>TradingView</h2>
+      <p class="muted" id="tvHint">Grafik / alarm ayarlarını TradingView üzerinden düzenleyin.</p>
+      <div class="row">
+        <a class="btnlink" id="tvLink" href="#" style="display:none"><button class="primary" type="button">Grafiği aç</button></a>
+      </div>
+    </section>
+
+    <section>
+      <h2>Runtime miktar haritası</h2>
+      <p class="muted"><code>runtime_overrides.json</code> → <code>SYMBOL_QTY_MAP</code> (.env) üzerine bindirilir. Servis restart gerekmez.</p>
+      <div class="row" style="margin-bottom:10px">
+        <button type="button" id="btnFillMerged">Birleşik haritayı yükle (düzenle → Kaydet)</button>
+        <button type="button" id="btnFormat">JSON’u düzenle</button>
+      </div>
+      <label for="qty">JSON nesnesi</label>
+      <textarea id="qty" spellcheck="false"></textarea>
+      <div class="row" style="margin-top:12px">
+        <button class="primary" type="button" id="btnSave">Kaydet</button>
+        <button type="button" id="btnReloadMap">Dosyadan oku</button>
+        <button type="button" id="btnClear">Runtime sıfırla</button>
+      </div>
+      <p class="muted" id="mapMsg" style="margin-top:12px"></p>
+    </section>
+  </div>
+
+  <div id="toast" role="status"></div>
+
+  <script>
+    window.__BOOTSTRAP__ = __BOOTSTRAP__;
+  </script>
+  <script>
+    const boot = window.__BOOTSTRAP__ || {};
+    const tvUrl = boot.tradingview_strategy_url || "";
+    const publicBase = (boot.public_base_url || "").replace(/\/$/, "");
+    const tokenKey = "tradebot_dashboard_token_v1";
+
+    const $ = (id) => document.getElementById(id);
+    const toastEl = $("toast");
+    let lastStatus = null;
+
+    function baseUrl() {
+      if (publicBase) return publicBase;
+      return window.location.origin;
+    }
+
+    function toast(msg, isErr) {
+      toastEl.textContent = msg;
+      toastEl.style.borderColor = isErr ? "var(--danger)" : "var(--border)";
+      toastEl.classList.add("show");
+      clearTimeout(toastEl._t);
+      toastEl._t = setTimeout(() => toastEl.classList.remove("show"), 2600);
+    }
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        toast("Panoya kopyalandı", false);
+      } catch (_) {
+        toast("Kopyalanamadı (tarayıcı izni)", true);
+      }
+    }
+
+    const tokenEl = $("token");
+    tokenEl.value = sessionStorage.getItem(tokenKey) || "";
+    tokenEl.addEventListener("change", () => {
+      sessionStorage.setItem(tokenKey, tokenEl.value.trim());
+    });
+    $("btnToggleToken").addEventListener("click", () => {
+      tokenEl.type = tokenEl.type === "password" ? "text" : "password";
+    });
+
+    $("webhookUrl").value = baseUrl() + "/tradingview/webhook";
+    $("healthUrl").value = baseUrl() + "/health";
+    $("btnCopyWebhook").addEventListener("click", () => copyText($("webhookUrl").value));
+    $("btnCopyHealth").addEventListener("click", () => copyText($("healthUrl").value));
+
+    if (tvUrl) {
+      const a = $("tvLink");
+      a.href = tvUrl;
+      a.style.display = "inline-block";
+      $("tvHint").textContent = "Aşağıdaki bağlantı .env içindeki TRADINGVIEW_STRATEGY_URL değeridir.";
+    }
+
+    function authHeaders() {
+      const t = tokenEl.value.trim() || sessionStorage.getItem(tokenKey) || "";
+      return {
+        Authorization: "Bearer " + t,
+        "Content-Type": "application/json",
+      };
+    }
+
+    async function api(path, opts = {}) {
+      const res = await fetch(path, { ...opts, headers: { ...authHeaders(), ...(opts.headers || {}) } });
+      const text = await res.text();
+      let data = null;
+      try {
+        data = JSON.parse(text);
+      } catch (_) {
+        data = { raw: text };
+      }
+      if (!res.ok) throw new Error(data && data.error ? data.error : "HTTP " + res.status);
+      return data;
+    }
+
+    function pill(on, onText, offText) {
+      const s = on ? "on" : "off";
+      const t = on ? onText : offText;
+      return '<span class="pill ' + s + '">' + t + "</span>";
+    }
+
+    function renderCards(data) {
+      const rt = data.symbol_qty_runtime || {};
+      const merged = data.symbol_qty_merged || {};
+      const rtN = Object.keys(rt).length;
+      const mN = Object.keys(merged).length;
+      $("cards").innerHTML =
+        '<div class="card"><div class="k">Sunucu zamanı (UTC)</div><div class="v">' +
+        (data.server_time_utc || "—") +
+        "</div></div>" +
+        '<div class="card"><div class="k">Dry run</div><div class="v">' +
+        pill(!!data.dry_run, "Açık", "Kapalı") +
+        "</div></div>" +
+        '<div class="card"><div class="k">Canlı emir</div><div class="v">' +
+        pill(!!data.allow_live_orders, "İzinli", "Kapalı") +
+        "</div></div>" +
+        '<div class="card"><div class="k">Binance API</div><div class="v" style="font-size:0.8rem;font-weight:500">' +
+        (data.base_url || "—") +
+        "</div></div>" +
+        '<div class="card"><div class="k">Mod</div><div class="v">' +
+        (data.mode || "—") +
+        "</div></div>" +
+        '<div class="card"><div class="k">Parite (birleşik)</div><div class="v">' +
+        mN +
+        " sembol</div></div>" +
+        '<div class="card"><div class="k">Runtime bindirme</div><div class="v">' +
+        (rtN ? rtN + " sembol" : "Yok") +
+        "</div></div>";
+    }
+
+    async function refreshStatus() {
+      const statusMsg = $("statusMsg");
+      const statusBox = $("statusBox");
+      statusMsg.textContent = "yükleniyor…";
+      statusMsg.className = "";
+      try {
+        const data = await api("/api/dashboard/status");
+        lastStatus = data;
+        statusBox.textContent = JSON.stringify(data, null, 2);
+        renderCards(data);
+        statusMsg.textContent = "güncel";
+        statusMsg.className = "ok";
+        $("lastSync").textContent = "Son: " + new Date().toLocaleString();
+      } catch (e) {
+        statusMsg.textContent = "hata";
+        statusMsg.className = "err";
+        $("cards").innerHTML = '<div class="card"><div class="k">Hata</div><div class="v err">' + String(e) + "</div></div>";
+      }
+    }
+
+    $("btnToggleRaw").addEventListener("click", () => {
+      const pre = $("statusBox");
+      pre.hidden = !pre.hidden;
+    });
+
+    async function loadOverridesTextarea() {
+      const mapMsg = $("mapMsg");
+      mapMsg.textContent = "yükleniyor…";
+      mapMsg.className = "";
+      try {
+        const data = await api("/api/dashboard/overrides");
+        $("qty").value = JSON.stringify(data.symbol_qty_map || {}, null, 2);
+        mapMsg.textContent = "runtime dosyası yüklendi";
+        mapMsg.className = "ok";
+      } catch (e) {
+        mapMsg.textContent = String(e);
+        mapMsg.className = "err";
+      }
+    }
+
+    $("btnFillMerged").addEventListener("click", async () => {
+      const mapMsg = $("mapMsg");
+      try {
+        if (!lastStatus) await refreshStatus();
+        const m = (lastStatus && lastStatus.symbol_qty_merged) || {};
+        $("qty").value = JSON.stringify(m, null, 2);
+        mapMsg.textContent = "Birleşik harita textarea’ya alındı. Kaydedersen tamamı runtime’a yazılır.";
+        mapMsg.className = "warn";
+      } catch (e) {
+        mapMsg.textContent = String(e);
+        mapMsg.className = "err";
+      }
+    });
+
+    $("btnFormat").addEventListener("click", () => {
+      const mapMsg = $("mapMsg");
+      try {
+        const obj = JSON.parse($("qty").value || "{}");
+        $("qty").value = JSON.stringify(obj, null, 2);
+        mapMsg.textContent = "JSON biçimlendi";
+        mapMsg.className = "ok";
+      } catch (e) {
+        mapMsg.textContent = String(e);
+        mapMsg.className = "err";
+      }
+    });
+
+    $("btnRefresh").addEventListener("click", refreshStatus);
+    $("btnReloadMap").addEventListener("click", loadOverridesTextarea);
+
+    $("btnSave").addEventListener("click", async () => {
+      const mapMsg = $("mapMsg");
+      mapMsg.textContent = "kaydediliyor…";
+      mapMsg.className = "";
+      try {
+        const obj = JSON.parse($("qty").value || "{}");
+        if (typeof obj !== "object" || obj === null || Array.isArray(obj)) throw new Error("JSON kökü nesne olmalı");
+        const norm = {};
+        for (const [k, v] of Object.entries(obj)) norm[String(k).toUpperCase()] = Number(v);
+        await api("/api/dashboard/overrides", { method: "PUT", body: JSON.stringify({ symbol_qty_map: norm }) });
+        mapMsg.textContent = "Kaydedildi";
+        mapMsg.className = "ok";
+        toast("Runtime miktar haritası güncellendi", false);
+        await refreshStatus();
+      } catch (e) {
+        mapMsg.textContent = String(e);
+        mapMsg.className = "err";
+        toast(String(e), true);
+      }
+    });
+
+    $("btnClear").addEventListener("click", async () => {
+      const mapMsg = $("mapMsg");
+      mapMsg.textContent = "sıfırlanıyor…";
+      mapMsg.className = "";
+      try {
+        await api("/api/dashboard/overrides", { method: "DELETE" });
+        $("qty").value = "{}";
+        mapMsg.textContent = "Runtime sıfırlandı (.env aynı)";
+        mapMsg.className = "ok";
+        toast("Runtime temizlendi", false);
+        await refreshStatus();
+      } catch (e) {
+        mapMsg.textContent = String(e);
+        mapMsg.className = "err";
+      }
+    });
+
+    refreshStatus();
+    loadOverridesTextarea();
+  </script>
+</body>
+</html>
