@@ -3,235 +3,1325 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tradebot — kontrol</title>
+  <title>__PRODUCT_NAME__ — Konsol</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
   <style>
     :root {
-      color-scheme: dark light;
-      --bg: #0f1115;
-      --panel: #171a21;
-      --border: #2a3040;
-      --text: #e8eaed;
-      --muted: #9aa3b2;
-      --accent: #3b82f6;
-      --accent-dim: #2563eb;
-      --danger: #ef4444;
-      --ok: #22c55e;
-      --warn: #f59e0b;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --bg: #05070c;
+      --bg-elevated: #0c1018;
+      --sidebar: #080b12;
+      --panel: rgba(18, 24, 36, 0.92);
+      --panel-solid: #141b28;
+      --border: rgba(255, 255, 255, 0.07);
+      --border-strong: rgba(255, 255, 255, 0.12);
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #6366f1;
+      --accent-2: #38bdf8;
+      --danger: #fb7185;
+      --ok: #4ade80;
+      --warn: #fbbf24;
+      --sans: "DM Sans", system-ui, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, monospace;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --sidebar-w: 252px;
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+      --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.2);
     }
-    @media (prefers-color-scheme: light) {
-      :root {
-        --bg: #f4f6f9;
-        --panel: #fff;
-        --border: #d8dee9;
-        --text: #1a1d24;
-        --muted: #5c6570;
-      }
-    }
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      margin: 0;
       font-family: var(--sans);
-      background: var(--bg);
+      background:
+        radial-gradient(ellipse 80% 50% at 0% 0%, rgba(99, 102, 241, 0.12), transparent 50%),
+        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(56, 189, 248, 0.08), transparent 45%),
+        var(--bg);
       color: var(--text);
-      line-height: 1.5;
+      line-height: 1.55;
       min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
     }
-    .wrap { max-width: 960px; margin: 0 auto; padding: 28px 20px 48px; }
-    header { margin-bottom: 28px; }
-    h1 { font-size: 1.5rem; font-weight: 650; margin: 0 0 6px; letter-spacing: -0.02em; }
-    .sub { color: var(--muted); font-size: 0.95rem; margin: 0; max-width: 62ch; }
-    section {
-      background: var(--panel);
+    .login-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        radial-gradient(ellipse 70% 50% at 50% 0%, rgba(99,102,241,0.18), transparent),
+        var(--bg);
+    }
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      padding: 36px 32px;
+      border-radius: var(--radius);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 18px 20px;
-      margin-bottom: 18px;
+      background: var(--panel);
     }
-    h2 { font-size: 1rem; font-weight: 600; margin: 0 0 14px; }
-    label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; }
+    .login-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-weight: 700;
+      font-size: 1.15rem;
+      letter-spacing: -0.03em;
+    }
+    .login-logo span {
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid;
+      place-items: center;
+    }
+    .login-card h1 { font-size: 1.35rem; margin: 16px 0 8px; letter-spacing: -0.02em; }
+    .login-card p { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
+    label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
     input[type="password"], input[type="text"], textarea {
       width: 100%;
-      padding: 11px 12px;
+      padding: 12px 14px;
       border-radius: 10px;
       border: 1px solid var(--border);
       background: var(--bg);
       color: var(--text);
       font-family: var(--mono);
-      font-size: 0.88rem;
+      font-size: 0.85rem;
     }
-    textarea { min-height: 200px; resize: vertical; }
-    .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-    .grow { flex: 1; min-width: 140px; }
-    button {
+    textarea { min-height: 220px; resize: vertical; line-height: 1.45; }
+    .btn {
       font: inherit;
-      padding: 10px 14px;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-strong);
+      background: var(--bg-elevated);
+      color: var(--text);
+      cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s;
+    }
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.06);
+      box-shadow: var(--shadow-sm);
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary {
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #4338ca 100%);
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+    }
+    .btn-primary:hover {
+      filter: brightness(1.06);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+    }
+    .btn-ghost {
+      background: transparent;
+      border-color: transparent;
+    }
+    .btn-ghost:hover { background: rgba(255, 255, 255, 0.05); }
+    .btn-sm { padding: 8px 14px; font-size: 0.84rem; }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .grow { flex: 1; min-width: 120px; }
+    .app { display: none; min-height: 100vh; width: 100%; }
+    .app.ready { display: flex; }
+    .sidebar {
+      width: var(--sidebar-w);
+      flex-shrink: 0;
+      background: linear-gradient(180deg, var(--sidebar) 0%, #060910 100%);
+      border-right: 1px solid var(--border);
+      padding: 22px 16px;
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 20;
+    }
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 10px 24px;
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: -0.03em;
+      text-decoration: none;
+      color: var(--text);
+    }
+    .sidebar-brand .mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 11px;
+      background: linear-gradient(145deg, var(--accent), var(--accent-2));
+      display: grid;
+      place-items: center;
+      font-size: 1rem;
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+    }
+    .nav-section-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      padding: 16px 12px 8px;
+      opacity: 0.85;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      width: 100%;
+      padding: 11px 14px;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      margin-bottom: 3px;
+      position: relative;
+      transition: color 0.15s, background 0.15s;
+    }
+    .nav-item:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .nav-item.active {
+      color: #fff;
+      background: linear-gradient(90deg, rgba(99, 102, 241, 0.28), rgba(99, 102, 241, 0.08));
+      box-shadow: inset 3px 0 0 var(--accent);
+    }
+    .nav-icon {
+      width: 20px;
+      text-align: center;
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+    .sidebar-foot {
+      margin-top: auto;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .btn-logout {
+      width: 100%;
+      margin-top: 12px;
+      color: var(--muted);
+      border-color: var(--border);
+      font-weight: 500;
+    }
+    .btn-logout:hover {
+      color: var(--danger);
+      border-color: rgba(251, 113, 133, 0.4);
+      background: rgba(251, 113, 133, 0.08);
+    }
+    .session-user {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 10px;
+      font-family: var(--mono);
+      opacity: 0.85;
+    }
+    .main {
+      flex: 1;
+      min-width: 0;
+      padding: 32px 40px 56px;
+      max-width: 1280px;
+      width: 100%;
+    }
+    .main.chart-wide { max-width: 1440px; }
+    .page-topbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .page-topbar .page-head { margin-bottom: 0; flex: 1; min-width: 200px; }
+    .page-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+    .sync-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+    .sync-badge.ok { border-color: rgba(74, 222, 128, 0.25); color: var(--ok); }
+    .chart-wrap {
+      position: relative;
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      background: var(--bg);
+    }
+    #chartContainer {
+      width: 100%;
+      height: 520px;
+    }
+    .chart-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 10px;
+      margin: 14px 0 12px;
+    }
+    .chart-stat {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+    .chart-stat .k {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+    }
+    .chart-stat .v {
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+    .chart-stat .v.sig-buy { color: #34d399; }
+    .chart-stat .v.sig-sell { color: #f87171; }
+    .chart-stat .v.sig-hold { color: var(--muted); }
+    .chart-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .chart-legend {
+      font-size: 0.82rem;
+      margin: 6px 0 4px;
+      line-height: 1.6;
+    }
+    .signal-table-wrap {
+      margin-top: 16px;
+      max-height: 220px;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .signal-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+    .signal-table th,
+    .signal-table td {
+      padding: 8px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .signal-table th {
+      position: sticky;
+      top: 0;
+      background: var(--panel);
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .signal-table tr:last-child td { border-bottom: none; }
+    .signal-table tbody tr.signal-row {
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .signal-table tbody tr.signal-row:hover { background: rgba(99, 102, 241, 0.08); }
+    .signal-table tbody tr.signal-row.active {
+      background: rgba(99, 102, 241, 0.16);
+      outline: 1px solid rgba(99, 102, 241, 0.35);
+    }
+    .signal-kind-ma { color: #a78bfa; }
+    .signal-kind-bot { color: #38bdf8; }
+    .signal-filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0 12px;
+      align-items: center;
+    }
+    .signal-filter-bar .chip {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+    .signal-filter-bar .chip.active {
+      background: rgba(99, 102, 241, 0.2);
+      border-color: #6366f1;
+      color: var(--text);
+    }
+    .signal-detail-panel {
+      margin-top: 16px;
+      padding: 16px 18px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: linear-gradient(145deg, rgba(99, 102, 241, 0.08), rgba(18, 24, 32, 0.6));
+    }
+    .signal-detail-panel h3 {
+      font-size: 0.95rem;
+      margin: 0 0 12px;
+      font-weight: 600;
+    }
+    .signal-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px 16px;
+    }
+    .signal-detail-grid .item .k {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .signal-detail-grid .item .v {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-top: 3px;
+      word-break: break-word;
+    }
+    .signal-detail-msg {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .chart-controls select {
+      padding: 9px 12px;
       border-radius: 10px;
       border: 1px solid var(--border);
       background: var(--bg);
       color: var(--text);
-      cursor: pointer;
+      font: inherit;
+      font-size: 0.88rem;
     }
-    button:hover { filter: brightness(1.08); }
-    button.primary {
-      background: var(--accent);
-      border-color: var(--accent-dim);
-      color: #fff;
+    .page-head { margin-bottom: 24px; }
+    .page-head h2 {
+      font-size: 1.65rem;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      margin-bottom: 8px;
+      line-height: 1.2;
     }
-    button.ghost { background: transparent; }
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-    .card {
+    .page-head p { color: var(--muted); font-size: 0.94rem; max-width: 62ch; line-height: 1.55; }
+    .panel {
+      background: var(--panel);
+      backdrop-filter: blur(12px);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 14px;
-      background: var(--bg);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
     }
-    .card .k { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 4px; }
-    .card .v { font-size: 0.95rem; font-weight: 600; word-break: break-all; }
-    .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
-    .pill.on { background: rgba(34,197,94,0.2); color: var(--ok); }
-    .pill.off { background: rgba(239,68,68,0.15); color: var(--danger); }
+    .panel-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .panel-header h3 { margin: 0; font-size: 1rem; font-weight: 600; }
+    .panel h3 { font-size: 1rem; font-weight: 600; margin-bottom: 16px; }
+    .cards {
+      display: none;
+    }
+    .status-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+    .status-strip .chip-stat {
+      flex: 1 1 140px;
+      min-width: 120px;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+    }
+    .status-strip .chip-stat .k {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+    .status-strip .chip-stat .v { font-size: 0.88rem; font-weight: 600; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 11px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .pill.on {
+      background: rgba(74, 222, 128, 0.14);
+      color: var(--ok);
+      border: 1px solid rgba(74, 222, 128, 0.28);
+    }
+    .pill.off {
+      background: rgba(251, 113, 133, 0.12);
+      color: var(--danger);
+      border: 1px solid rgba(251, 113, 133, 0.25);
+    }
     pre {
       margin: 0;
       padding: 14px;
-      border-radius: 12px;
+      border-radius: 10px;
       background: var(--bg);
       border: 1px solid var(--border);
-      font-size: 0.78rem;
+      font-family: var(--mono);
+      font-size: 0.76rem;
       overflow: auto;
-      max-height: 320px;
+      max-height: 300px;
     }
     .muted { color: var(--muted); font-size: 0.88rem; margin: 0 0 12px; }
-    .muted:last-child { margin-bottom: 0; }
     .ok { color: var(--ok); }
     .err { color: var(--danger); }
     .warn { color: var(--warn); }
+    .linkbox { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .linkbox input { flex: 1; min-width: 180px; }
+    .linkbox:last-child { margin-bottom: 0; }
+    .view { display: none; }
+    .view.active { display: block; }
+    .status-bar { font-size: 0.88rem; margin-bottom: 14px; }
     #toast {
       position: fixed;
       bottom: 22px;
       right: 22px;
-      left: 22px;
-      max-width: 420px;
-      margin-left: auto;
+      max-width: 380px;
       padding: 12px 16px;
       border-radius: 12px;
       background: var(--panel);
       border: 1px solid var(--border);
-      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-      font-size: 0.9rem;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+      font-size: 0.88rem;
       opacity: 0;
       pointer-events: none;
       transform: translateY(8px);
       transition: 0.22s ease;
-      z-index: 50;
+      z-index: 100;
     }
     #toast.show { opacity: 1; transform: translateY(0); }
-    .linkbox {
-      display: flex;
-      gap: 8px;
-      align-items: stretch;
-      flex-wrap: wrap;
+    .code-hint {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      padding: 12px;
+      border-radius: 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      margin-top: 12px;
+      overflow-x: auto;
     }
-    .linkbox input { flex: 1; min-width: 200px; }
-    a.btnlink { text-decoration: none; }
+    .pos-table-wrap { overflow-x: auto; margin-top: 8px; }
+    table.pos-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .pos-table tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
+    .pos-table th, .pos-table td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .pos-table th {
+      color: var(--muted);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      font-weight: 600;
+      background: var(--bg-elevated);
+    }
+    .side-long { color: var(--ok); font-weight: 600; }
+    .side-short { color: var(--danger); font-weight: 600; }
+    .pnl-pos { color: var(--ok); }
+    .pnl-neg { color: var(--danger); }
+    .overview-hero {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 0;
+    }
+    @media (max-width: 1100px) {
+      .overview-hero { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 520px) {
+      .overview-hero { grid-template-columns: 1fr; }
+    }
+    .hero-stat {
+      padding: 20px 18px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .hero-stat:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-1px);
+    }
+    .hero-stat .label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .hero-stat .value {
+      font-size: 1.55rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      font-variant-numeric: tabular-nums;
+    }
+    .hero-stat .sub {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 8px;
+      line-height: 1.35;
+    }
+    .hero-stat-accent {
+      border-color: rgba(99, 102, 241, 0.4);
+      background: linear-gradient(160deg, rgba(99, 102, 241, 0.18) 0%, var(--bg-elevated) 55%);
+      box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.15) inset;
+    }
+    .hero-stat-pnl .value { font-size: 1.75rem; }
+    .binance-account-panel {
+      margin-bottom: 20px;
+      border-color: rgba(240, 185, 11, 0.22);
+      background: linear-gradient(165deg, rgba(240, 185, 11, 0.06) 0%, var(--panel) 40%);
+    }
+    .binance-account-panel h3 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      font-size: 1.05rem;
+    }
+    .binance-account-panel .mode-tag {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(240,185,11,0.12);
+      color: #f0b90b;
+      border: 1px solid rgba(240,185,11,0.3);
+    }
+    .binance-metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .binance-metrics .item .k {
+      display: block;
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+    .binance-metrics .item .v {
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: var(--mono);
+    }
+    .binance-balance-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .binance-balance-main .label {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    .binance-balance-main .amount {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      font-family: var(--mono);
+      color: #f0b90b;
+    }
+    .binance-balance-rows {
+      display: grid;
+      gap: 10px;
+    }
+    .binance-balance-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .binance-balance-row:last-child { border-bottom: none; }
+    .binance-balance-row .val {
+      font-family: var(--mono);
+      font-weight: 600;
+    }
+    .overview-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 900px) {
+      .overview-grid { grid-template-columns: 1fr; }
+    }
+    .detail-list {
+      display: grid;
+      gap: 0;
+      margin: 0;
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.88rem;
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-row dt {
+      color: var(--muted);
+      font-weight: 500;
+      margin: 0;
+      flex-shrink: 0;
+    }
+    .detail-row dd {
+      margin: 0;
+      text-align: right;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      word-break: break-all;
+    }
+    .symbol-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .symbol-chip {
+      font-size: 0.72rem;
+      font-family: var(--mono);
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: rgba(99,102,241,0.12);
+      border: 1px solid rgba(99,102,241,0.25);
+      color: #c7d2fe;
+    }
+    .activity-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 320px;
+      overflow-y: auto;
+    }
+    .activity-feed-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px 14px;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      font-size: 0.84rem;
+    }
+    .activity-feed-item .time {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .activity-feed-item .act {
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+    .cards .card .hint {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 4px;
+      font-weight: 400;
+    }
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--ok);
+      display: inline-block;
+      margin-right: 6px;
+      animation: pulse 1.5s ease infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+    .strategy-grid {
+      display: grid;
+      gap: 14px;
+    }
+    .strategy-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .strategy-row:last-child { border-bottom: none; }
+    .switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: var(--border);
+      border-radius: 999px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      left: 3px;
+      top: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: 0.2s;
+    }
+    .switch input:checked + .slider { background: var(--accent); }
+    .switch input:checked + .slider::before { transform: translateX(20px); }
+    input.str-input {
+      max-width: 160px;
+      padding: 8px 10px;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+    }
+    @media (max-width: 768px) {
+      .app.ready { flex-direction: column; }
+      .main { padding: 20px 16px 40px; }
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 4px;
+        padding: 12px;
+      }
+      .sidebar-brand { width: 100%; padding-bottom: 8px; }
+      .nav-section-label { display: none; }
+      .nav-item { width: auto; flex: 1; min-width: 88px; justify-content: center; font-size: 0.8rem; padding: 8px 10px; }
+      .nav-item.active { box-shadow: inset 0 -2px 0 var(--accent); }
+      .sidebar-foot { width: 100%; }
+      .page-topbar { flex-direction: column; }
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1>Tradebot kontrol</h1>
-      <p class="sub">Strateji (Pine, alarm koşulları) TradingView’dedir. Buradan durum, webhook adresleri ve <strong>runtime</strong> miktar haritasını yönetirsiniz.</p>
-    </header>
+  <div id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="login-logo"><span>⚡</span> __PRODUCT_NAME__</div>
+      <h1>Konsola giriş</h1>
+      <p>Sunucudaki <code style="font-family:var(--mono);font-size:0.85em">DASHBOARD_TOKEN</code> değerini girin. Kelime <strong>Bearer</strong> yazmayın — sadece token.</p>
+      <label for="tokenLogin">Panel anahtarı</label>
+      <input id="tokenLogin" type="password" autocomplete="off" placeholder="••••••••••••" />
+      <div class="row" style="margin-top:14px">
+        <button type="button" class="btn btn-ghost btn-sm" id="btnToggleLogin">Göster</button>
+        <button type="button" class="btn btn-primary grow" id="btnEnter">Giriş yap</button>
+      </div>
+      <p class="muted" style="margin-top:16px;margin-bottom:0;font-size:0.85rem">
+        Token yalnızca bu tarayıcıda saklanır.
+      </p>
+    </div>
+  </div>
 
-    <section>
-      <h2>Panel anahtarı</h2>
-      <label for="token"><code>DASHBOARD_TOKEN</code></label>
-      <div class="row">
-        <input class="grow" id="token" type="password" autocomplete="off" placeholder="Bearer token" />
-        <button type="button" class="ghost" id="btnToggleToken">Göster</button>
+  <div id="app" class="app">
+    <aside class="sidebar">
+      <a class="sidebar-brand" href="/dashboard">
+        <span class="mark">⚡</span>
+        __PRODUCT_NAME__
+      </a>
+      <div class="nav-section-label">Konsol</div>
+      <button type="button" class="nav-item active" data-view="overview"><span class="nav-icon">◉</span> Genel bakış</button>
+      <button type="button" class="nav-item" data-view="positions"><span class="nav-icon">◎</span> Pozisyonlar</button>
+      <button type="button" class="nav-item" data-view="charts"><span class="nav-icon">▣</span> Al / sat grafiği</button>
+      <div class="nav-section-label">Ayarlar</div>
+      <button type="button" class="nav-item" data-view="strategy"><span class="nav-icon">⚙</span> Strateji</button>
+      <button type="button" class="nav-item" data-view="quantities"><span class="nav-icon">⚖</span> Miktarlar</button>
+      <button type="button" class="nav-item" data-view="activity"><span class="nav-icon">☰</span> Son işlemler</button>
+      <button type="button" class="nav-item" data-view="security"><span class="nav-icon">🔒</span> Güvenlik</button>
+      <div class="sidebar-foot">
+        <span>SignalRail · v2</span>
+        <p class="session-user" id="sessionUserLabel"></p>
+        <button type="button" class="btn btn-ghost btn-logout" id="btnLogout">Çıkış yap</button>
       </div>
-      <p class="muted" style="margin-top:12px">Tarayıcıda <code>sessionStorage</code> ile saklanır. Üretimde güçlü token + mümkünse HTTPS kullanın.</p>
-    </section>
+    </aside>
 
-    <section>
-      <h2>Durum</h2>
-      <div class="row" style="margin-bottom:14px">
-        <button class="primary" type="button" id="btnRefresh">Yenile</button>
-        <span id="statusMsg"></span>
-        <span class="muted" id="lastSync" style="margin-left:auto"></span>
-      </div>
-      <div class="cards" id="cards"></div>
-      <div class="row" style="margin-bottom:10px">
-        <button type="button" id="btnToggleRaw">Ham JSON göster / gizle</button>
-      </div>
-      <pre id="statusBox" hidden></pre>
-    </section>
+    <main class="main">
+      <section id="view-overview" class="view active">
+        <div class="page-topbar">
+          <div class="page-head">
+            <h2>Genel bakış</h2>
+            <p>Binance Demo Futures hesabı, açık pozisyonlar ve MA sinyal botunun canlı durumu.</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-primary btn-sm" type="button" id="btnRefresh">Yenile</button>
+            <span class="sync-badge ok" id="syncBadge"><span class="live-dot"></span><span id="statusMsg">—</span></span>
+            <span class="sync-badge" id="lastSync">—</span>
+          </div>
+        </div>
 
-    <section>
-      <h2>Webhook ve sağlık</h2>
-      <p class="muted">TradingView’de URL tam olarak <code>…/tradingview/webhook</code> olmalı; HTTP için port <strong>80</strong> (Nginx).</p>
-      <label>Webhook</label>
-      <div class="linkbox" style="margin-bottom:12px">
-        <input id="webhookUrl" readonly />
-        <button type="button" id="btnCopyWebhook">Kopyala</button>
-      </div>
-      <label>Sağlık</label>
-      <div class="linkbox">
-        <input id="healthUrl" readonly />
-        <button type="button" id="btnCopyHealth">Kopyala</button>
-      </div>
-    </section>
+        <div class="panel binance-account-panel">
+          <h3>Account <span class="mode-tag">USDT Cross</span></h3>
+          <div class="binance-metrics">
+            <div class="item"><span class="k">Margin Ratio</span><span class="v" id="bnMarginRatio">—</span></div>
+            <div class="item"><span class="k">Maintenance Margin</span><span class="v" id="bnMaintMargin">—</span></div>
+            <div class="item"><span class="k">Kullanılabilir</span><span class="v" id="bnAvailable">—</span></div>
+          </div>
+          <div class="binance-balance-main">
+            <span class="label">Balance <span class="muted">(toplam bakiye / cüzdan)</span></span>
+            <span class="amount" id="bnBalance">—</span>
+          </div>
+          <div class="binance-balance-rows">
+            <div class="binance-balance-row">
+              <span class="muted">Margin Balance</span>
+              <span class="val" id="bnMarginBalance">—</span>
+            </div>
+            <div class="binance-balance-row">
+              <span class="muted">Unrealized PNL</span>
+              <span class="val" id="bnUnrealizedPnl">—</span>
+            </div>
+            <div class="binance-balance-row">
+              <span class="muted">Kar — bugün (realize)</span>
+              <span class="val" id="bnRealizedToday">—</span>
+            </div>
+            <div class="binance-balance-row">
+              <span class="muted">Kar — 7 gün (realize)</span>
+              <span class="val" id="bnRealized7d">—</span>
+            </div>
+          </div>
+          <p class="muted" id="accountModeHint" style="margin:14px 0 0;font-size:0.82rem"></p>
+        </div>
 
-    <section>
-      <h2>TradingView</h2>
-      <p class="muted" id="tvHint">Grafik / alarm ayarlarını TradingView üzerinden düzenleyin.</p>
-      <div class="row">
-        <a class="btnlink" id="tvLink" href="#" style="display:none"><button class="primary" type="button">Grafiği aç</button></a>
-      </div>
-    </section>
+        <div class="panel">
+          <div class="overview-hero" id="overviewHero">
+            <div class="hero-stat hero-stat-pnl hero-stat-accent"><div class="label">Açık PnL</div><div class="value" id="heroTotalPnl">—</div><div class="sub" id="heroPnlSub">Gerçekleşmemiş · USDT</div></div>
+            <div class="hero-stat"><div class="label">Açık pozisyon</div><div class="value" id="heroPosCount">—</div><div class="sub" id="heroPosSplit">Long · Short</div></div>
+            <div class="hero-stat"><div class="label">Bakiye</div><div class="value" id="heroEquity">—</div><div class="sub" id="heroEquitySub">USDT cüzdan</div></div>
+            <div class="hero-stat"><div class="label">Sinyal botu</div><div class="value" id="heroSignalMode">—</div><div class="sub" id="heroSignalSub">MA 7/25 · 5m</div></div>
+          </div>
+          <div class="status-strip" id="statusStrip"></div>
+          <div class="cards" id="cards" aria-hidden="true"></div>
+        </div>
 
-    <section>
-      <h2>Runtime miktar haritası</h2>
-      <p class="muted"><code>runtime_overrides.json</code> → <code>SYMBOL_QTY_MAP</code> (.env) üzerine bindirilir. Servis restart gerekmez.</p>
-      <div class="row" style="margin-bottom:10px">
-        <button type="button" id="btnFillMerged">Birleşik haritayı yükle (düzenle → Kaydet)</button>
-        <button type="button" id="btnFormat">JSON’u düzenle</button>
-      </div>
-      <label for="qty">JSON nesnesi</label>
-      <textarea id="qty" spellcheck="false"></textarea>
-      <div class="row" style="margin-top:12px">
-        <button class="primary" type="button" id="btnSave">Kaydet</button>
-        <button type="button" id="btnReloadMap">Dosyadan oku</button>
-        <button type="button" id="btnClear">Runtime sıfırla</button>
-      </div>
-      <p class="muted" id="mapMsg" style="margin-top:12px"></p>
-    </section>
+        <div class="overview-grid">
+          <div class="panel">
+            <div class="panel-header"><h3>Bot &amp; strateji</h3></div>
+            <dl class="detail-list" id="overviewConfig"></dl>
+            <div class="symbol-chips" id="overviewSymbolChips"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><h3>Bağlantı &amp; emir modu</h3></div>
+            <dl class="detail-list" id="overviewConnection"></dl>
+            <dl class="detail-list" id="overviewAccount" style="margin-top:12px"></dl>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="row status-bar" style="margin-bottom:12px">
+            <h3 style="margin:0"><span class="live-dot"></span> Açık pozisyonlar</h3>
+            <span class="muted" id="overviewPosUpdated" style="margin-left:auto;font-size:0.82rem"></span>
+          </div>
+          <div class="pos-table-wrap">
+            <table class="pos-table" id="overviewPosTable">
+              <thead>
+                <tr>
+                  <th>Parite</th>
+                  <th>Yön</th>
+                  <th>Miktar</th>
+                  <th>Giriş</th>
+                  <th>Mark</th>
+                  <th>PnL</th>
+                  <th>Liq.</th>
+                  <th>Kald.</th>
+                </tr>
+              </thead>
+              <tbody id="overviewPosBody"><tr><td colspan="8" class="muted">Yükleniyor…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:18px">
+          <div class="row status-bar" style="margin-bottom:12px">
+            <h3 style="margin:0">Son bot olayları</h3>
+            <a href="#" class="muted" id="overviewGoActivity" style="margin-left:auto;font-size:0.82rem">Tümünü gör →</a>
+          </div>
+          <div class="activity-feed" id="overviewActivityFeed"><div class="muted">Yükleniyor…</div></div>
+        </div>
+
+        <div class="panel" style="margin-top:18px">
+          <button type="button" class="btn btn-ghost btn-sm" id="btnToggleRaw">Ham JSON (durum API)</button>
+          <pre id="statusBox" hidden style="margin-top:12px"></pre>
+        </div>
+      </section>
+
+      <section id="view-positions" class="view">
+        <div class="page-head">
+          <h2>Açık pozisyonlar</h2>
+          <p>Binance Futures hesabından her <strong>5 saniyede</strong> otomatik yenilenir.</p>
+        </div>
+        <div class="panel">
+          <div class="row status-bar">
+            <span class="live-dot"></span>
+            <span id="posLiveLabel" class="muted">Canlı</span>
+            <button type="button" class="btn btn-primary btn-sm" id="btnRefreshPos">Şimdi yenile</button>
+            <label class="muted" style="margin-left:auto;display:flex;align-items:center;gap:8px;font-size:0.85rem">
+              <input type="checkbox" id="posAutoRefresh" checked /> Otomatik yenile
+            </label>
+          </div>
+          <p class="muted" id="posUpdated"></p>
+          <div class="pos-table-wrap">
+            <table class="pos-table">
+              <thead>
+                <tr>
+                  <th>Parite</th>
+                  <th>Yön</th>
+                  <th>Miktar</th>
+                  <th>Giriş</th>
+                  <th>Mark</th>
+                  <th>PnL (USDT)</th>
+                  <th>Kaldıraç</th>
+                </tr>
+              </thead>
+              <tbody id="posTableBody"></tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:22px">Bekleyen emirler</h3>
+          <div id="openOrdersBox" class="muted">—</div>
+        </div>
+      </section>
+
+      <section id="view-charts" class="view">
+        <div class="page-head">
+          <h2>Al / sat grafiği</h2>
+          <p>Mum, hacim, kısa/uzun MA ve kesişim noktaları. Botun gerçek işlemleri ok ile, teorik MA kesişimleri daire ile işaretlenir — <strong>5 sn</strong> yenileme.</p>
+        </div>
+        <div class="panel">
+          <div class="chart-controls">
+            <span class="live-dot"></span>
+            <label class="muted" for="chartSymbol">Parite</label>
+            <select id="chartSymbol"></select>
+            <label class="muted" for="chartInterval">Aralık</label>
+            <select id="chartInterval">
+              <option value="1m">1 dk</option>
+              <option value="5m" selected>5 dk</option>
+              <option value="15m">15 dk</option>
+              <option value="1h">1 saat</option>
+              <option value="4h">4 saat</option>
+            </select>
+            <label class="muted" for="chartLimit">Mum</label>
+            <select id="chartLimit">
+              <option value="150">150</option>
+              <option value="300" selected>300</option>
+              <option value="500">500</option>
+            </select>
+            <button type="button" class="btn btn-primary btn-sm" id="btnRefreshChart">Yenile</button>
+            <label class="muted" style="display:flex;align-items:center;gap:6px">
+              <input type="checkbox" id="chartAutoRefresh" checked /> Canlı
+            </label>
+            <label class="muted" style="display:flex;align-items:center;gap:6px">
+              <input type="checkbox" id="chartShowMa" checked /> MA çizgileri
+            </label>
+            <label class="muted" style="display:flex;align-items:center;gap:6px">
+              <input type="checkbox" id="chartShowCrosses" checked /> MA kesişimleri
+            </label>
+            <label class="muted" style="display:flex;align-items:center;gap:6px">
+              <input type="checkbox" id="chartShowBot" checked /> Bot işlemleri
+            </label>
+            <label class="muted" style="display:flex;align-items:center;gap:6px">
+              <input type="checkbox" id="chartShowVolume" checked /> Hacim
+            </label>
+          </div>
+          <p class="chart-legend muted">
+            <span style="color:#a78bfa">●</span> MA kesişimi (teorik) ·
+            <span style="color:#34d399">▲</span> Bot AL ·
+            <span style="color:#f87171">▼</span> Bot SAT ·
+            <span style="color:#fbbf24">—</span> Kısa MA ·
+            <span style="color:#818cf8">—</span> Uzun MA ·
+            <span style="color:#6366f1">—</span> Giriş ·
+            <span style="color:#22d3ee">—</span> Mark
+          </p>
+          <div class="chart-stats" id="chartStats">
+            <div class="chart-stat"><div class="k">Son fiyat</div><div class="v" id="csPrice">—</div></div>
+            <div class="chart-stat"><div class="k">Kısa MA</div><div class="v" id="csMaShort">—</div></div>
+            <div class="chart-stat"><div class="k">Uzun MA</div><div class="v" id="csMaLong">—</div></div>
+            <div class="chart-stat"><div class="k">MA farkı</div><div class="v" id="csMaDiff">—</div></div>
+            <div class="chart-stat"><div class="k">Anlık sinyal</div><div class="v sig-hold" id="csSignal">—</div></div>
+            <div class="chart-stat"><div class="k">Pozisyon</div><div class="v" id="csPosition">—</div></div>
+            <div class="chart-stat"><div class="k">Kesişim / bot</div><div class="v" id="csMarkers">—</div></div>
+          </div>
+          <p class="muted" id="chartMeta">—</p>
+          <div class="chart-wrap">
+            <div id="chartContainer"></div>
+          </div>
+          <div class="signal-detail-panel" id="signalDetailPanel">
+            <h3 id="signalDetailTitle">Sinyal detayı</h3>
+            <p class="muted" id="signalDetailHint" style="margin:0 0 10px;font-size:0.85rem">
+              Tablodan bir satıra tıklayın veya grafiğe en son bot sinyali seçilir.
+            </p>
+            <div class="signal-detail-grid" id="signalDetailGrid">
+              <div class="item"><div class="k">—</div><div class="v">Grafik yükleniyor…</div></div>
+            </div>
+            <p class="signal-detail-msg" id="signalDetailMsg"></p>
+          </div>
+          <h3 style="margin-top:18px;font-size:1rem">Sinyal geçmişi</h3>
+          <div class="signal-filter-bar">
+            <button type="button" class="chip active" data-signal-filter="all">Tümü</button>
+            <button type="button" class="chip" data-signal-filter="bot">Sadece bot</button>
+            <button type="button" class="chip" data-signal-filter="ma_cross">Sadece MA kesişim</button>
+            <span class="muted" id="signalFilterCount" style="margin-left:auto;font-size:0.82rem"></span>
+          </div>
+          <div class="signal-table-wrap">
+            <table class="signal-table">
+              <thead>
+                <tr>
+                  <th>Zaman (UTC)</th>
+                  <th>Tür</th>
+                  <th>Yön</th>
+                  <th>Fiyat</th>
+                  <th>MA kısa</th>
+                  <th>MA uzun</th>
+                  <th>Miktar</th>
+                  <th>Olay</th>
+                  <th>Durum</th>
+                </tr>
+              </thead>
+              <tbody id="chartSignalBody">
+                <tr><td colspan="9" class="muted">Grafik yüklenince dolar…</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="muted" id="signalDetailFullMsg" style="margin-top:10px;font-size:0.82rem;display:none"></p>
+        </div>
+      </section>
+
+      <section id="view-strategy" class="view">
+        <div class="page-head">
+          <h2>Strateji ayarları</h2>
+          <p>Restart gerekmez; ayarlar anında uygulanır. MA periyotları .env içindeki SHORT/LONG_WINDOW değerleridir.</p>
+        </div>
+        <div class="panel">
+          <div class="strategy-grid">
+            <div class="strategy-row">
+              <div>
+                <strong>İşlemleri duraklat</strong>
+                <div class="muted" style="font-size:0.82rem">Sinyal gelir ama emir gönderilmez</div>
+              </div>
+              <label class="switch"><input type="checkbox" id="stPause" /><span class="slider"></span></label>
+            </div>
+            <div class="strategy-row">
+              <div>
+                <strong>Dry run</strong>
+                <div class="muted" style="font-size:0.82rem">Test emri (gerçek pozisyon açmaz)</div>
+              </div>
+              <label class="switch"><input type="checkbox" id="stDryRun" /><span class="slider"></span></label>
+            </div>
+            <div class="strategy-row">
+              <div>
+                <strong>Canlı emir izni</strong>
+                <div class="muted" style="font-size:0.82rem">Kapalıysa dry run dışında emir bloklanır</div>
+              </div>
+              <label class="switch"><input type="checkbox" id="stAllowLive" /><span class="slider"></span></label>
+            </div>
+            <div class="strategy-row">
+              <div>
+                <strong>Varsayılan parite</strong>
+                <div class="muted" style="font-size:0.82rem">Alarmda symbol yoksa kullanılır</div>
+              </div>
+              <input class="str-input" id="stDefaultSymbol" type="text" placeholder="BTCUSDT" />
+            </div>
+            <div class="strategy-row">
+              <div>
+                <strong>Mod</strong>
+                <div class="muted" style="font-size:0.82rem">Sabit: reverse futures</div>
+              </div>
+              <span class="pill on">futures_reverse</span>
+            </div>
+          </div>
+          <div class="row" style="margin-top:18px">
+            <button type="button" class="btn btn-primary" id="btnSaveStrategy">Stratejiyi kaydet</button>
+            <button type="button" class="btn btn-ghost" id="btnResetStrategy">Runtime sıfırla (.env)</button>
+          </div>
+          <p class="muted" id="strategyMsg" style="margin-top:12px;margin-bottom:0"></p>
+        </div>
+        <div class="panel">
+          <h3>Parite miktar haritası</h3>
+          <p class="muted">Sinyal botu emirlerinde kullanılan varsayılan miktarlar.</p>
+          <textarea id="stQtyMap" spellcheck="false" style="min-height:160px"></textarea>
+        </div>
+      </section>
+
+      <section id="view-activity" class="view">
+        <div class="page-head">
+          <h2>Son işlemler</h2>
+          <p>MA sinyal botu kayıtları. Sekme açıkken <strong>4 saniyede</strong> bir yenilenir.</p>
+        </div>
+        <div class="panel">
+          <div class="row status-bar">
+            <button class="btn btn-primary btn-sm" type="button" id="btnRefreshActivity">Yenile</button>
+            <label class="muted" style="display:flex;align-items:center;gap:6px;font-size:0.85rem">
+              <input type="checkbox" id="activityAutoRefresh" checked /> Otomatik yenile
+            </label>
+            <select id="activityFilter" class="str-input" style="width:auto;min-width:140px;padding:8px 10px;font-family:var(--sans)">
+              <option value="">Tümü</option>
+              <option value="signal">MA sinyal</option>
+            </select>
+            <span class="muted" id="activityUpdated" style="margin-left:auto"></span>
+          </div>
+          <div class="pos-table-wrap">
+            <table class="pos-table" id="activityTable">
+              <thead>
+                <tr>
+                  <th>Zaman (UTC)</th>
+                  <th>Kaynak</th>
+                  <th>Olay</th>
+                  <th>Sembol</th>
+                  <th>İşlem</th>
+                  <th>Durum</th>
+                  <th>Detay</th>
+                </tr>
+              </thead>
+              <tbody id="activityTableBody">
+                <tr><td colspan="7" class="muted">Yükleniyor…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-quantities" class="view">
+        <div class="page-head">
+          <h2>Parite miktarları</h2>
+          <p><code>runtime_overrides.json</code> değerleri .env <code>SYMBOL_QTY_MAP</code> üzerine bindirilir — restart gerekmez.</p>
+        </div>
+        <div class="panel">
+          <div class="row" style="margin-bottom:12px">
+            <button type="button" class="btn btn-ghost btn-sm" id="btnFillMerged">Birleşik haritayı yükle</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="btnFormat">JSON düzenle</button>
+          </div>
+          <label for="qty">symbol_qty_map (JSON)</label>
+          <textarea id="qty" spellcheck="false"></textarea>
+          <div class="row" style="margin-top:14px">
+            <button class="btn btn-primary" type="button" id="btnSave">Kaydet</button>
+            <button type="button" class="btn btn-ghost" id="btnReloadMap">Dosyadan oku</button>
+            <button type="button" class="btn btn-ghost" id="btnClear">Runtime sıfırla</button>
+          </div>
+          <p class="muted" id="mapMsg" style="margin-top:12px;margin-bottom:0"></p>
+        </div>
+      </section>
+
+      <section id="view-security" class="view">
+        <div class="page-head">
+          <h2>Güvenlik</h2>
+          <p>Üretimde HTTPS, güçlü token ve API anahtarı kısıtlamaları kullanın.</p>
+        </div>
+        <div class="panel">
+          <h3>Panel anahtarı</h3>
+          <label for="token">DASHBOARD_TOKEN (oturum)</label>
+          <div class="row">
+            <input class="grow" id="token" type="password" autocomplete="off" />
+            <button type="button" class="btn btn-ghost btn-sm" id="btnToggleToken">Göster</button>
+            <button type="button" class="btn btn-primary btn-sm" id="btnSaveToken">Kaydet</button>
+          </div>
+          <p class="muted" style="margin-top:12px;margin-bottom:0">Tarayıcıda <code>sessionStorage</code> ile saklanır. Token değişince yeniden giriş yapın.</p>
+        </div>
+        <div class="panel">
+          <h3>Oturum</h3>
+          <p class="muted">Bu cihazdaki panel oturumunu sonlandırır. Webhook ve bot çalışmaya devam eder.</p>
+          <button type="button" class="btn btn-ghost btn-logout" id="btnLogoutSecurity">Çıkış yap</button>
+        </div>
+      </section>
+    </main>
   </div>
 
   <div id="toast" role="status"></div>
 
+  <script type="application/json" id="dashboard-boot">%%DASHBOARD_BOOT_JSON%%</script>
   <script>
-    window.__BOOTSTRAP__ = __BOOTSTRAP__;
-  </script>
-  <script>
-    const boot = window.__BOOTSTRAP__ || {};
-    const tvUrl = boot.tradingview_strategy_url || "";
+    const boot = (() => {
+      try {
+        return JSON.parse(document.getElementById("dashboard-boot").textContent || "{}");
+      } catch (_) {
+        return {};
+      }
+    })();
+    const productName = boot.product_name || "SignalRail";
     const publicBase = (boot.public_base_url || "").replace(/\/$/, "");
+    const apiBase = (boot.api_base_url || boot.public_base_url || "").replace(/\/$/, "");
     const tokenKey = "tradebot_dashboard_token_v1";
+    const isRemoteApi = !!apiBase && typeof location !== "undefined" && location.origin !== apiBase;
 
     const $ = (id) => document.getElementById(id);
     const toastEl = $("toast");
     let lastStatus = null;
+    let lastPositions = [];
+    let posTimer = null;
+    let chartTimer = null;
+    let activityTimer = null;
 
     function baseUrl() {
-      if (publicBase) return publicBase;
-      return window.location.origin;
+      return publicBase || window.location.origin;
     }
 
     function toast(msg, isErr) {
@@ -247,120 +1337,1261 @@
         await navigator.clipboard.writeText(text);
         toast("Panoya kopyalandı", false);
       } catch (_) {
-        toast("Kopyalanamadı (tarayıcı izni)", true);
+        toast("Kopyalanamadı", true);
       }
     }
 
-    const tokenEl = $("token");
-    tokenEl.value = sessionStorage.getItem(tokenKey) || "";
-    tokenEl.addEventListener("change", () => {
-      sessionStorage.setItem(tokenKey, tokenEl.value.trim());
-    });
-    $("btnToggleToken").addEventListener("click", () => {
-      tokenEl.type = tokenEl.type === "password" ? "text" : "password";
+    function getToken() {
+      return (
+        ($("token") && $("token").value.trim()) ||
+        ($("tokenLogin") && $("tokenLogin").value.trim()) ||
+        sessionStorage.getItem(tokenKey) ||
+        ""
+      );
+    }
+
+    function requireToken() {
+      const t = getToken();
+      if (!t) {
+        toast("Önce giriş yapın (panel anahtarı)", true);
+        return false;
+      }
+      return true;
+    }
+
+    function maskToken(t) {
+      if (!t || t.length < 8) return "••••";
+      return t.slice(0, 4) + "…" + t.slice(-4);
+    }
+
+    function updateSessionLabel() {
+      const label = $("sessionUserLabel");
+      if (label) label.textContent = "Oturum: " + maskToken(getToken());
+    }
+
+    function showApp() {
+      $("loginScreen").style.display = "none";
+      $("app").classList.add("ready");
+      if ($("token")) $("token").value = sessionStorage.getItem(tokenKey) || "";
+      updateSessionLabel();
+    }
+
+    function stopPosPoll() {
+      if (posTimer) {
+        clearInterval(posTimer);
+        posTimer = null;
+      }
+    }
+
+    function stopChartPoll() {
+      if (chartTimer) {
+        clearInterval(chartTimer);
+        chartTimer = null;
+      }
+    }
+
+    function stopActivityPoll() {
+      if (activityTimer) {
+        clearInterval(activityTimer);
+        activityTimer = null;
+      }
+    }
+
+    function logoutApp() {
+      stopPosPoll();
+      stopChartPoll();
+      stopActivityPoll();
+      sessionStorage.removeItem(tokenKey);
+      if ($("token")) $("token").value = "";
+      if ($("tokenLogin")) $("tokenLogin").value = "";
+      $("app").classList.remove("ready");
+      $("loginScreen").style.display = "grid";
+      if ($("sessionUserLabel")) $("sessionUserLabel").textContent = "";
+      toast("Çıkış yapıldı", false);
+    }
+
+    function enterApp() {
+      const t = $("tokenLogin").value.trim();
+      if (!t) {
+        toast("Panel anahtarı gerekli", true);
+        return;
+      }
+      sessionStorage.setItem(tokenKey, t);
+      if ($("token")) $("token").value = t;
+      showApp();
+      refreshOverview();
+      loadOverridesTextarea();
+      loadStrategy();
+      startPosPoll();
+    }
+
+    function bindClick(id, fn) {
+      const el = $(id);
+      if (el) el.addEventListener("click", fn);
+    }
+
+    async function saveQtyMap() {
+      if (!requireToken()) return;
+      const mapMsg = $("mapMsg");
+      if (mapMsg) {
+        mapMsg.textContent = "kaydediliyor…";
+        mapMsg.className = "";
+      }
+      try {
+        const obj = JSON.parse(($("qty") && $("qty").value) || "{}");
+        if (typeof obj !== "object" || obj === null || Array.isArray(obj)) {
+          throw new Error("JSON kökü nesne olmalı");
+        }
+        const norm = {};
+        for (const [k, v] of Object.entries(obj)) norm[String(k).toUpperCase()] = Number(v);
+        await api("/api/dashboard/overrides", {
+          method: "PUT",
+          body: JSON.stringify({ symbol_qty_map: norm }),
+        });
+        if (mapMsg) {
+          mapMsg.textContent = "Kaydedildi";
+          mapMsg.className = "ok";
+        }
+        toast("Miktar haritası güncellendi", false);
+        await refreshStatus();
+      } catch (e) {
+        if (mapMsg) {
+          mapMsg.textContent = String(e);
+          mapMsg.className = "err";
+        }
+        toast(String(e), true);
+      }
+    }
+
+    document.addEventListener("click", function (e) {
+      const btn = e.target && e.target.closest ? e.target.closest("button[id]") : null;
+      if (!btn || !btn.id) return;
+      const id = btn.id;
+
+      if (id === "btnEnter") {
+        e.preventDefault();
+        enterApp();
+        return;
+      }
+      if (id === "btnLogout" || id === "btnLogoutSecurity") {
+        e.preventDefault();
+        logoutApp();
+        return;
+      }
+      if (id === "btnToggleLogin") {
+        e.preventDefault();
+        const el = $("tokenLogin");
+        if (el) el.type = el.type === "password" ? "text" : "password";
+        return;
+      }
+      if (id === "btnToggleToken") {
+        e.preventDefault();
+        const el = $("token");
+        if (el) el.type = el.type === "password" ? "text" : "password";
+        return;
+      }
+      if (id === "btnSaveToken") {
+        e.preventDefault();
+        const el = $("token");
+        const t = (el && el.value.trim()) || getToken();
+        if (!t) {
+          toast("Token boş", true);
+          return;
+        }
+        sessionStorage.setItem(tokenKey, t);
+        if (el) el.value = t;
+        toast("Token kaydedildi", false);
+        updateSessionLabel();
+        return;
+      }
+      if (id === "btnSave") {
+        e.preventDefault();
+        saveQtyMap();
+        return;
+      }
+      if (id === "btnSaveStrategy") {
+        e.preventDefault();
+        saveStrategy();
+        return;
+      }
+      if (id === "btnRefresh") {
+        e.preventDefault();
+        refreshOverview();
+        return;
+      }
+      if (id === "btnRefreshPos") {
+        e.preventDefault();
+        refreshPositions();
+        return;
+      }
+      if (id === "btnRefreshChart") {
+        e.preventDefault();
+        refreshChart();
+        return;
+      }
+      if (id === "btnRefreshActivity") {
+        e.preventDefault();
+        refreshActivity();
+        return;
+      }
+      if (id === "btnReloadMap") {
+        e.preventDefault();
+        loadOverridesTextarea();
+        return;
+      }
+      if (id === "btnToggleRaw") {
+        e.preventDefault();
+        const pre = $("statusBox");
+        if (pre) pre.hidden = !pre.hidden;
+        return;
+      }
+      if (id === "btnFillMerged") {
+        e.preventDefault();
+        (async function () {
+          const mapMsg = $("mapMsg");
+          try {
+            if (!requireToken()) return;
+            if (!lastStatus) await refreshStatus();
+            if ($("qty")) {
+              $("qty").value = JSON.stringify((lastStatus && lastStatus.symbol_qty_merged) || {}, null, 2);
+            }
+            if (mapMsg) {
+              mapMsg.textContent = "Birleşik harita yüklendi — Kaydet ile runtime’a yazılır.";
+              mapMsg.className = "warn";
+            }
+          } catch (err) {
+            if (mapMsg) {
+              mapMsg.textContent = String(err);
+              mapMsg.className = "err";
+            }
+          }
+        })();
+        return;
+      }
+      if (id === "btnFormat") {
+        e.preventDefault();
+        const mapMsg = $("mapMsg");
+        try {
+          if ($("qty")) $("qty").value = JSON.stringify(JSON.parse($("qty").value || "{}"), null, 2);
+          if (mapMsg) {
+            mapMsg.textContent = "JSON biçimlendi";
+            mapMsg.className = "ok";
+          }
+        } catch (err) {
+          if (mapMsg) {
+            mapMsg.textContent = String(err);
+            mapMsg.className = "err";
+          }
+        }
+        return;
+      }
+      if (id === "btnClear") {
+        e.preventDefault();
+        (async function () {
+          if (!requireToken()) return;
+          const mapMsg = $("mapMsg");
+          try {
+            await api("/api/dashboard/overrides", { method: "DELETE" });
+            if ($("qty")) $("qty").value = "{}";
+            if (mapMsg) {
+              mapMsg.textContent = "Runtime sıfırlandı";
+              mapMsg.className = "ok";
+            }
+            toast("Runtime temizlendi", false);
+            await refreshStatus();
+          } catch (err) {
+            if (mapMsg) {
+              mapMsg.textContent = String(err);
+              mapMsg.className = "err";
+            }
+            toast(String(err), true);
+          }
+        })();
+        return;
+      }
+      if (id === "btnResetStrategy") {
+        e.preventDefault();
+        (async function () {
+          if (!requireToken()) return;
+          try {
+            await api("/api/dashboard/overrides", { method: "DELETE" });
+            toast("Runtime sıfırlandı", false);
+            await loadStrategy();
+            await refreshStatus();
+            await loadOverridesTextarea();
+          } catch (err) {
+            toast(String(err), true);
+          }
+        })();
+        return;
+      }
     });
 
-    $("webhookUrl").value = baseUrl() + "/tradingview/webhook";
-    $("healthUrl").value = baseUrl() + "/health";
-    $("btnCopyWebhook").addEventListener("click", () => copyText($("webhookUrl").value));
-    $("btnCopyHealth").addEventListener("click", () => copyText($("healthUrl").value));
+    const tokenLoginEl = $("tokenLogin");
+    if (tokenLoginEl) {
+      tokenLoginEl.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          enterApp();
+        }
+      });
+    }
 
-    if (tvUrl) {
-      const a = $("tvLink");
-      a.href = tvUrl;
-      a.style.display = "inline-block";
-      $("tvHint").textContent = "Aşağıdaki bağlantı .env içindeki TRADINGVIEW_STRATEGY_URL değeridir.";
+    function bootSession() {
+      if (sessionStorage.getItem(tokenKey)) {
+        showApp();
+        refreshOverview();
+        loadStrategy();
+        startPosPoll();
+      }
+    }
+    bootSession();
+
+    document.querySelectorAll(".nav-item[data-view]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const v = btn.getAttribute("data-view");
+        document.querySelectorAll(".nav-item").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        document.querySelectorAll(".view").forEach((el) => el.classList.remove("active"));
+        $("view-" + v).classList.add("active");
+        const mainEl = document.querySelector(".main");
+        if (mainEl) mainEl.classList.toggle("chart-wide", v === "charts");
+        if (v === "charts") {
+          populateChartSymbols();
+          startChartPoll();
+        } else {
+          stopChartPoll();
+        }
+        if (v === "activity") {
+          startActivityPoll();
+        } else {
+          stopActivityPoll();
+        }
+      });
+    });
+
+    const activityFilterEl = $("activityFilter");
+    if (activityFilterEl) {
+      activityFilterEl.addEventListener("change", function () {
+        refreshActivity();
+      });
+    }
+    const activityAutoEl = $("activityAutoRefresh");
+    if (activityAutoEl) {
+      activityAutoEl.addEventListener("change", function () {
+        if (this.checked && $("view-activity") && $("view-activity").classList.contains("active")) {
+          startActivityPoll();
+        } else {
+          stopActivityPoll();
+        }
+      });
     }
 
     function authHeaders() {
-      const t = tokenEl.value.trim() || sessionStorage.getItem(tokenKey) || "";
+      const t = getToken();
       return {
         Authorization: "Bearer " + t,
         "Content-Type": "application/json",
       };
     }
 
+    function apiUrl(path) {
+      const p = path.startsWith("/") ? path : "/" + path;
+      return apiBase ? apiBase + p : p;
+    }
+
     async function api(path, opts = {}) {
-      const res = await fetch(path, { ...opts, headers: { ...authHeaders(), ...(opts.headers || {}) } });
+      const res = await fetch(apiUrl(path), { ...opts, headers: { ...authHeaders(), ...(opts.headers || {}) } });
       const text = await res.text();
       let data = null;
-      try {
-        data = JSON.parse(text);
-      } catch (_) {
-        data = { raw: text };
-      }
+      try { data = JSON.parse(text); } catch (_) { data = { raw: text }; }
       if (!res.ok) throw new Error(data && data.error ? data.error : "HTTP " + res.status);
       return data;
     }
 
     function pill(on, onText, offText) {
       const s = on ? "on" : "off";
-      const t = on ? onText : offText;
-      return '<span class="pill ' + s + '">' + t + "</span>";
+      return '<span class="pill ' + s + '">' + (on ? onText : offText) + "</span>";
     }
 
-    function renderCards(data) {
-      const rt = data.symbol_qty_runtime || {};
+    function renderStatusStrip(data) {
+      const el = $("statusStrip");
+      if (!el) return;
       const merged = data.symbol_qty_merged || {};
-      const rtN = Object.keys(rt).length;
-      const mN = Object.keys(merged).length;
-      $("cards").innerHTML =
-        '<div class="card"><div class="k">Sunucu zamanı (UTC)</div><div class="v">' +
-        (data.server_time_utc || "—") +
-        "</div></div>" +
-        '<div class="card"><div class="k">Dry run</div><div class="v">' +
-        pill(!!data.dry_run, "Açık", "Kapalı") +
-        "</div></div>" +
-        '<div class="card"><div class="k">Canlı emir</div><div class="v">' +
-        pill(!!data.allow_live_orders, "İzinli", "Kapalı") +
-        "</div></div>" +
-        '<div class="card"><div class="k">Binance API</div><div class="v" style="font-size:0.8rem;font-weight:500">' +
-        (data.base_url || "—") +
-        "</div></div>" +
-        '<div class="card"><div class="k">Mod</div><div class="v">' +
-        (data.mode || "—") +
-        "</div></div>" +
-        '<div class="card"><div class="k">Parite (birleşik)</div><div class="v">' +
-        mN +
-        " sembol</div></div>" +
-        '<div class="card"><div class="k">Runtime bindirme</div><div class="v">' +
-        (rtN ? rtN + " sembol" : "Yok") +
-        "</div></div>";
+      const symCount = Object.keys(merged).length;
+      const paused = !!data.trading_paused;
+      const items = [
+        ["İşlem", pill(!paused, "Aktif", "Duraklat")],
+        ["Dry run", pill(!!data.dry_run, "Açık", "Kapalı")],
+        ["Canlı emir", pill(!!data.allow_live_orders, "İzinli", "Kapalı")],
+        ["Mum / MA", (data.kline_interval || "—") + " · " + (data.short_window || "7") + "/" + (data.long_window || "25")],
+        ["Parite", symCount + " adet"],
+        ["Mod", data.mode || "—"],
+      ];
+      el.innerHTML = items
+        .map(function (pair) {
+          return (
+            '<div class="chip-stat"><div class="k">' +
+            pair[0] +
+            '</div><div class="v">' +
+            pair[1] +
+            "</div></div>"
+          );
+        })
+        .join("");
+    }
+
+    function sumPnl(positions) {
+      return positions.reduce(function (s, p) {
+        return s + (parseFloat(p.unrealized_pnl) || 0);
+      }, 0);
+    }
+
+    function detailRow(label, value) {
+      return '<div class="detail-row"><dt>' + label + "</dt><dd>" + value + "</dd></div>";
+    }
+
+    let lastAccount = null;
+
+    function renderOverviewAccount(acc) {
+      if (!acc) return;
+      lastAccount = acc;
+      const wallet = parseFloat(acc.wallet_balance_usdt);
+      const margin = parseFloat(acc.margin_balance_usdt);
+      const unr = parseFloat(acc.unrealized_pnl_usdt);
+      const r7 = parseFloat(acc.realized_pnl_7d_usdt);
+      const r1 = parseFloat(acc.realized_pnl_today_usdt);
+      const maint = parseFloat(acc.maintenance_margin_usdt || 0);
+      const ratio = parseFloat(acc.margin_ratio_pct || 0);
+
+      if ($("bnBalance")) $("bnBalance").textContent = fmtNum(wallet, 4) + " USDT";
+      if ($("bnMarginBalance")) $("bnMarginBalance").textContent = fmtNum(margin, 4) + " USDT";
+      if ($("bnUnrealizedPnl")) {
+        $("bnUnrealizedPnl").textContent = fmtNum(unr, 4) + " USDT";
+        $("bnUnrealizedPnl").className = "val " + pnlClass(unr);
+      }
+      if ($("bnMaintMargin")) $("bnMaintMargin").textContent = fmtNum(maint, 4) + " USDT";
+      if ($("bnMarginRatio")) {
+        $("bnMarginRatio").textContent = fmtNum(ratio, 2) + "%";
+        $("bnMarginRatio").className = "v " + (ratio > 80 ? "pnl-neg" : ratio > 50 ? "warn" : "side-long");
+      }
+      if ($("bnAvailable")) $("bnAvailable").textContent = fmtNum(acc.available_balance_usdt, 4) + " USDT";
+      if ($("bnRealizedToday")) {
+        $("bnRealizedToday").textContent = fmtNum(r1, 2) + " USDT";
+        $("bnRealizedToday").className = "val " + pnlClass(r1);
+      }
+      if ($("bnRealized7d")) {
+        $("bnRealized7d").textContent = fmtNum(r7, 2) + " USDT";
+        $("bnRealized7d").className = "val " + pnlClass(r7);
+      }
+
+      const eq = $("heroEquity");
+      if (eq) {
+        eq.textContent = fmtNum(wallet, 2);
+        eq.className = "value";
+      }
+      if ($("heroEquitySub")) {
+        $("heroEquitySub").textContent =
+          "Kullanılabilir " + fmtNum(acc.available_balance_usdt, 2) + " USDT";
+      }
+      const hint = $("accountModeHint");
+      if (hint) {
+        hint.textContent =
+          (acc.is_demo ? "Demo Futures" : "Canlı Futures") +
+          " · " +
+          (acc.base_url || "").replace(/^https?:\/\//, "") +
+          " — Balance = toplam cüzdan; Margin Balance = Balance + Unrealized PNL";
+      }
+      const el = $("overviewAccount");
+      if (el) {
+        el.innerHTML =
+          detailRow("Balance (toplam bakiye)", "<strong>" + fmtNum(wallet, 4) + " USDT</strong>") +
+          detailRow("Margin Balance", fmtNum(margin, 4) + " USDT") +
+          detailRow("Unrealized PNL", '<span class="' + pnlClass(unr) + '">' + fmtNum(unr, 4) + " USDT</span>") +
+          detailRow("Maintenance Margin", fmtNum(maint, 4) + " USDT") +
+          detailRow("Margin Ratio", fmtNum(ratio, 2) + "%") +
+          detailRow("Kullanılabilir", fmtNum(acc.available_balance_usdt, 4) + " USDT") +
+          detailRow("Kar — bugün", '<span class="' + pnlClass(r1) + '">' + fmtNum(r1, 2) + " USDT</span>") +
+          detailRow("Kar — 7 gün", '<span class="' + pnlClass(r7) + '">' + fmtNum(r7, 2) + " USDT</span>");
+      }
+    }
+
+    async function refreshAccount() {
+      try {
+        const acc = await api("/api/dashboard/account");
+        renderOverviewAccount(acc);
+      } catch (e) {
+        if ($("overviewAccount")) $("overviewAccount").innerHTML = '<div class="err">' + e + "</div>";
+        if ($("accountModeHint")) $("accountModeHint").textContent = "Hesap verisi alınamadı: " + e;
+      }
+    }
+
+    function renderOverviewHero(positions, data) {
+      if (!data) return;
+      const total = sumPnl(positions);
+      const longs = positions.filter(function (p) { return p.side === "LONG"; }).length;
+      const shorts = positions.filter(function (p) { return p.side === "SHORT"; }).length;
+      const elPnl = $("heroTotalPnl");
+      if (elPnl) {
+        elPnl.textContent = fmtNum(total, 2);
+        elPnl.className = "value " + pnlClass(total);
+      }
+      if ($("heroPosCount")) $("heroPosCount").textContent = String(positions.length);
+      if ($("heroPosSplit")) $("heroPosSplit").textContent = longs + " Long · " + shorts + " Short";
+      const ma = "MA " + (data.short_window || "7") + "/" + (data.long_window || "25") + " · " + (data.kline_interval || "5m");
+      if ($("heroSignalMode")) $("heroSignalMode").textContent = data.trading_paused ? "Duraklatıldı" : "Çalışıyor";
+      if ($("heroSignalSub")) {
+        $("heroSignalSub").textContent =
+          ma + (data.dry_run ? " · dry run" : data.allow_live_orders ? " · canlı" : " · emir bloklu");
+      }
+    }
+
+    function renderOverviewConfig(data) {
+      const cfg = $("overviewConfig");
+      const chips = $("overviewSymbolChips");
+      if (!cfg) return;
+      const merged = data.symbol_qty_merged || {};
+      const envSyms = (data.signal_symbols || "")
+        .split(",")
+        .map(function (s) { return s.trim().toUpperCase(); })
+        .filter(Boolean);
+      const scanList = envSyms.length ? envSyms.join(", ") : Object.keys(merged).join(", ") || "—";
+      cfg.innerHTML =
+        detailRow("Strateji modu", data.mode || "—") +
+        detailRow("Sinyal pariteleri", scanList) +
+        detailRow("Mum / MA", (data.kline_interval || "—") + " · " + (data.short_window || "7") + "/" + (data.long_window || "25")) +
+        detailRow("Varsayılan parite", data.default_symbol || "—") +
+        detailRow("Runtime miktar", data.symbol_qty_runtime && Object.keys(data.symbol_qty_runtime).length ? "Özel harita aktif" : ".env haritası");
+      if (chips) {
+        chips.innerHTML = Object.keys(merged)
+          .sort()
+          .map(function (sym) {
+            return '<span class="symbol-chip" title="Emir miktarı">' + sym + " · " + fmtNum(merged[sym], 4) + "</span>";
+          })
+          .join("");
+      }
+    }
+
+    function renderOverviewConnection(data) {
+      const el = $("overviewConnection");
+      if (!el) return;
+      const base = (data.base_url || "—").replace(/^https?:\/\//, "");
+      el.innerHTML =
+        detailRow("Binance API", base) +
+        detailRow("İşlem", pill(!data.trading_paused, "Açık", "Duraklat")) +
+        detailRow("Dry run", pill(!!data.dry_run, "Açık", "Kapalı")) +
+        detailRow("Canlı emir", pill(!!data.allow_live_orders, "İzinli", "Kapalı")) +
+        detailRow(".env dry run", pill(!!data.env_dry_run, "true", "false"));
+    }
+
+    function renderOverviewPosTable(positions) {
+      const tbody = $("overviewPosBody");
+      if (!tbody) return;
+      tbody.innerHTML = positions.length
+        ? positions
+            .map(function (p) {
+              const c = p.side === "LONG" ? "side-long" : "side-short";
+              const liq = p.liquidation_price != null && parseFloat(p.liquidation_price) > 0 ? fmtNum(p.liquidation_price, 2) : "—";
+              return (
+                "<tr><td><strong>" +
+                p.symbol +
+                "</strong></td><td class=\"" +
+                c +
+                '">' +
+                p.side +
+                "</td><td>" +
+                fmtNum(p.amount, 6) +
+                "</td><td>" +
+                fmtNum(p.entry_price, 2) +
+                "</td><td>" +
+                fmtNum(p.mark_price, 2) +
+                '</td><td class="' +
+                pnlClass(p.unrealized_pnl) +
+                '"><strong>' +
+                fmtNum(p.unrealized_pnl, 4) +
+                "</strong></td><td class=\"muted\">" +
+                liq +
+                "</td><td>" +
+                (p.leverage || "—") +
+                "x</td></tr>"
+              );
+            })
+            .join("")
+        : '<tr><td colspan="8" class="muted">Açık pozisyon yok — bot HOLD veya henüz sinyal yok</td></tr>';
+    }
+
+    async function refreshOverviewActivity() {
+      const feed = $("overviewActivityFeed");
+      if (!feed || !getToken()) return;
+      try {
+        const data = await api("/api/dashboard/activity?limit=10");
+        const items = data.items || [];
+        feed.innerHTML = items.length
+          ? items
+              .map(function (row) {
+                const act = (row.action || "").toUpperCase();
+                const actCls = act === "BUY" ? "side-long" : act === "SELL" ? "side-short" : "";
+                const time = (row.ts || "").replace("T", " ").replace("Z", "");
+                return (
+                  '<div class="activity-feed-item"><span class="time">' +
+                  time +
+                  '</span><span><span class="muted">' +
+                  sourceLabel(row.source) +
+                  " · " +
+                  eventLabel(row.event) +
+                  (row.symbol ? " · <strong>" + row.symbol + "</strong>" : "") +
+                  '</span><div class="muted" style="font-size:0.78rem;margin-top:2px">' +
+                  (row.message || "") +
+                  '</div></span><span class="act ' +
+                  actCls +
+                  '">' +
+                  (act || "—") +
+                  "</span></div>"
+                );
+              })
+              .join("")
+          : '<div class="muted">Henüz kayıt yok — sinyal veya webhook sonrası dolar</div>';
+      } catch (e) {
+        feed.innerHTML = '<div class="err">' + e + "</div>";
+      }
+    }
+
+    async function refreshOverview() {
+      if (!requireToken()) return;
+      const statusMsg = $("statusMsg");
+      if (statusMsg) {
+        statusMsg.textContent = "yenileniyor…";
+        statusMsg.className = "";
+      }
+      try {
+        await Promise.all([
+          refreshStatus(),
+          refreshPositions(),
+          refreshAccount(),
+          refreshOverviewActivity(),
+        ]);
+        if (statusMsg) {
+          statusMsg.textContent = "güncel";
+          statusMsg.className = "ok";
+        }
+      } catch (_) {
+        if (statusMsg) {
+          statusMsg.textContent = "kısmi hata";
+          statusMsg.className = "warn";
+        }
+      }
+    }
+
+    function fmtNum(n, d) {
+      if (n == null || n === "") return "—";
+      const x = parseFloat(n);
+      return Number.isNaN(x) ? String(n) : x.toLocaleString("tr-TR", { maximumFractionDigits: d == null ? 4 : d });
+    }
+    function pnlClass(v) {
+      const x = parseFloat(v);
+      return Number.isNaN(x) || x === 0 ? "" : x > 0 ? "pnl-pos" : "pnl-neg";
+    }
+    function renderPositionsData(positions, openOrders) {
+      const tbody = $("posTableBody");
+      if (!tbody) return;
+      tbody.innerHTML = positions.length ? positions.map(function (p) {
+        const c = p.side === "LONG" ? "side-long" : "side-short";
+        return "<tr><td>" + p.symbol + '</td><td class="' + c + '">' + p.side + "</td><td>" + fmtNum(p.amount, 6) +
+          "</td><td>" + fmtNum(p.entry_price, 2) + "</td><td>" + fmtNum(p.mark_price, 2) +
+          '</td><td class="' + pnlClass(p.unrealized_pnl) + '">' + fmtNum(p.unrealized_pnl, 4) +
+          "</td><td>" + (p.leverage || "—") + "x</td></tr>";
+      }).join("") : '<tr><td colspan="7" class="muted">Açık pozisyon yok</td></tr>';
+      if ($("openOrdersBox")) $("openOrdersBox").textContent = openOrders.length ? openOrders.map(function (o) { return o.symbol + " " + o.side; }).join(" · ") : "Bekleyen emir yok";
+      lastPositions = positions;
+      renderOverviewPosTable(positions);
+      if ($("overviewPosUpdated")) $("overviewPosUpdated").textContent = "Son: " + new Date().toLocaleString("tr-TR");
+      if (lastStatus) renderOverviewHero(lastPositions, lastStatus);
+    }
+    async function refreshPositions() {
+      try {
+        const data = await api("/api/dashboard/positions");
+        renderPositionsData(data.positions || [], data.open_orders || []);
+        if ($("posUpdated")) $("posUpdated").textContent = "Son: " + new Date().toLocaleString("tr-TR");
+      } catch (e) {
+        if ($("posTableBody")) $("posTableBody").innerHTML = '<tr><td colspan="7" class="err">' + e + "</td></tr>";
+      }
+    }
+    function startPosPoll() {
+      refreshPositions();
+      if (posTimer) clearInterval(posTimer);
+      if ($("posAutoRefresh") && !$("posAutoRefresh").checked) return;
+      posTimer = setInterval(refreshPositions, 5000);
+    }
+
+    function sourceLabel(s) {
+      if (s === "signal") return "MA sinyal";
+      if (s === "webhook") return "Webhook";
+      return s || "—";
+    }
+    function eventLabel(e) {
+      const map = {
+        signal_change: "Sinyal",
+        order: "Emir",
+        received: "Alındı",
+        reject: "Red",
+        skipped: "Atlandı",
+      };
+      return map[e] || e || "—";
+    }
+    function activityStatusClass(st) {
+      if (!st) return "";
+      if (st === "filled" || st === "ok" || st === "trigger") return "side-long";
+      if (st === "skipped") return "muted";
+      if (st === "error") return "pnl-neg";
+      return "";
+    }
+    async function refreshActivity() {
+      const tbody = $("activityTableBody");
+      if (!tbody) return;
+      const filter = $("activityFilter") ? $("activityFilter").value : "";
+      try {
+        const data = await api("/api/dashboard/activity?limit=100");
+        let items = data.items || [];
+        if (filter) items = items.filter(function (i) { return i.source === filter; });
+        tbody.innerHTML = items.length
+          ? items
+              .map(function (row) {
+                const det = String(row.message || "").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+                const fail = row.ok === false ? " ✗" : "";
+                return (
+                  "<tr><td style=\"font-family:var(--mono);font-size:0.78rem\">" +
+                  (row.ts || "—") +
+                  "</td><td>" +
+                  sourceLabel(row.source) +
+                  "</td><td>" +
+                  eventLabel(row.event) +
+                  "</td><td>" +
+                  (row.symbol || "—") +
+                  "</td><td>" +
+                  (row.action || "—") +
+                  '</td><td class="' +
+                  activityStatusClass(row.status) +
+                  '">' +
+                  (row.status || "—") +
+                  fail +
+                  '</td><td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' +
+                  det +
+                  '">' +
+                  det +
+                  "</td></tr>"
+                );
+              })
+              .join("")
+          : '<tr><td colspan="7" class="muted">Kayıt yok (henüz sinyal veya webhook yok)</td></tr>';
+        if ($("activityUpdated"))
+          $("activityUpdated").textContent = "Son: " + new Date().toLocaleString("tr-TR");
+      } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="7" class="err">' + e + "</td></tr>";
+      }
+    }
+    function startActivityPoll() {
+      refreshActivity();
+      stopActivityPoll();
+      if ($("activityAutoRefresh") && !$("activityAutoRefresh").checked) return;
+      activityTimer = setInterval(refreshActivity, 4000);
+    }
+    async function loadStrategy() {
+      try {
+        const data = await api("/api/dashboard/strategy");
+        const st = await api("/api/dashboard/status");
+        const e = data.effective || {};
+        $("stPause").checked = !!e.trading_paused;
+        $("stDryRun").checked = !!e.dry_run;
+        $("stAllowLive").checked = !!e.allow_live_orders;
+        $("stDefaultSymbol").value = e.default_symbol || "";
+        $("stQtyMap").value = JSON.stringify(st.symbol_qty_merged || {}, null, 2);
+      } catch (e) { if ($("strategyMsg")) { $("strategyMsg").textContent = String(e); $("strategyMsg").className = "err"; } }
+    }
+    async function saveStrategy() {
+      if (!requireToken()) return;
+      const msg = $("strategyMsg");
+      try {
+        const norm = {};
+        for (const [k, v] of Object.entries(JSON.parse($("stQtyMap").value || "{}"))) norm[String(k).toUpperCase()] = Number(v);
+        await api("/api/dashboard/strategy", { method: "PUT", body: JSON.stringify({
+          trading_paused: $("stPause").checked, dry_run: $("stDryRun").checked,
+          allow_live_orders: $("stAllowLive").checked,
+          default_symbol: $("stDefaultSymbol").value.trim().toUpperCase(), symbol_qty_map: norm }) });
+        if (msg) {
+          msg.textContent = "Kaydedildi";
+          msg.className = "ok";
+        }
+        toast("Strateji güncellendi", false);
+        await refreshStatus();
+        if ($("qty")) $("qty").value = JSON.stringify(norm, null, 2);
+        populateChartSymbols();
+      } catch (e) {
+        if (msg) {
+          msg.textContent = String(e);
+          msg.className = "err";
+        }
+        toast(String(e), true);
+      }
+    }
+
+    let chartInstance = null;
+    let candleSeries = null;
+    let maShortSeries = null;
+    let maLongSeries = null;
+    let volumeSeries = null;
+    let chartPriceLines = [];
+    let lastChartSignals = [];
+    let chartSignalFilter = "all";
+    let selectedSignalId = null;
+
+    function populateChartSymbols() {
+      const sel = $("chartSymbol");
+      if (!sel) return;
+      const symbols = new Set();
+      if (lastStatus && lastStatus.symbol_qty_merged) {
+        Object.keys(lastStatus.symbol_qty_merged).forEach(function (s) { symbols.add(s); });
+      }
+      if (lastStatus && lastStatus.default_symbol) symbols.add(lastStatus.default_symbol);
+      symbols.add("BTCUSDT");
+      symbols.add("ETHUSDT");
+      const current = sel.value;
+      sel.innerHTML = Array.from(symbols).sort().map(function (s) {
+        return '<option value="' + s + '">' + s + "</option>";
+      }).join("");
+      if (current && symbols.has(current)) sel.value = current;
+    }
+
+    function initChart() {
+      const el = $("chartContainer");
+      if (!el || chartInstance || typeof LightweightCharts === "undefined") return;
+      chartInstance = LightweightCharts.createChart(el, {
+        width: el.clientWidth,
+        height: 520,
+        layout: { background: { color: "#121820" }, textColor: "#9aa3b2" },
+        grid: { vertLines: { color: "#2a3040" }, horzLines: { color: "#2a3040" } },
+        crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+        rightPriceScale: { borderColor: "#2a3040" },
+        timeScale: {
+          timeVisible: true,
+          secondsVisible: false,
+          borderColor: "#2a3040",
+        },
+      });
+      candleSeries = chartInstance.addCandlestickSeries({
+        upColor: "#34d399",
+        downColor: "#f87171",
+        borderVisible: false,
+        wickUpColor: "#34d399",
+        wickDownColor: "#f87171",
+      });
+      maShortSeries = chartInstance.addLineSeries({
+        color: "#fbbf24",
+        lineWidth: 2,
+        title: "MA kısa",
+        priceLineVisible: false,
+        lastValueVisible: true,
+      });
+      maLongSeries = chartInstance.addLineSeries({
+        color: "#818cf8",
+        lineWidth: 2,
+        title: "MA uzun",
+        priceLineVisible: false,
+        lastValueVisible: true,
+      });
+      volumeSeries = chartInstance.addHistogramSeries({
+        color: "#26a69a",
+        priceFormat: { type: "volume" },
+        priceScaleId: "volume",
+      });
+      chartInstance.priceScale("volume").applyOptions({
+        scaleMargins: { top: 0.82, bottom: 0 },
+      });
+      window.addEventListener("resize", function () {
+        if (chartInstance && el) chartInstance.applyOptions({ width: el.clientWidth });
+      });
+    }
+
+    function renderChartStats(data) {
+      const priceEl = $("csPrice");
+      const ms = $("csMaShort");
+      const ml = $("csMaLong");
+      const diff = $("csMaDiff");
+      const sig = $("csSignal");
+      const pos = $("csPosition");
+      const mk = $("csMarkers");
+      if (priceEl) priceEl.textContent = data.last_price != null ? fmtNum(data.last_price, 4) : "—";
+      if (ms) ms.textContent = data.ma_short_last != null ? fmtNum(data.ma_short_last, 4) : "—";
+      if (ml) ml.textContent = data.ma_long_last != null ? fmtNum(data.ma_long_last, 4) : "—";
+      if (diff && data.ma_short_last != null && data.ma_long_last != null) {
+        const d = data.ma_short_last - data.ma_long_last;
+        const pct = data.ma_long_last ? (d / data.ma_long_last) * 100 : 0;
+        diff.textContent = (d >= 0 ? "+" : "") + fmtNum(d, 4) + " (" + fmtNum(pct, 2) + "%)";
+        diff.style.color = d >= 0 ? "#34d399" : "#f87171";
+      }
+      if (sig) {
+        const s = (data.current_signal || "HOLD").toUpperCase();
+        sig.textContent = s === "BUY" ? "AL" : s === "SELL" ? "SAT" : "BEKLE";
+        sig.className = "v " + (s === "BUY" ? "sig-buy" : s === "SELL" ? "sig-sell" : "sig-hold");
+      }
+      if (pos) {
+        if (data.position_side && data.entry_price != null) {
+          pos.textContent =
+            data.position_side + " @ " + fmtNum(data.entry_price, 4);
+        } else {
+          pos.textContent = "Yok";
+        }
+      }
+      if (mk) {
+        mk.textContent =
+          (data.cross_marker_count || 0) +
+          " kesişim · " +
+          (data.bot_marker_count || 0) +
+          " bot";
+      }
+    }
+
+    function filteredChartSignals() {
+      if (chartSignalFilter === "bot") {
+        return lastChartSignals.filter(function (e) { return e.kind === "bot"; });
+      }
+      if (chartSignalFilter === "ma_cross") {
+        return lastChartSignals.filter(function (e) { return e.kind === "ma_cross"; });
+      }
+      return lastChartSignals;
+    }
+
+    function formatSignalTime(ev) {
+      if (ev.ts) return String(ev.ts).replace("T", " ").replace("Z", " UTC");
+      const t = ev.time || 0;
+      return new Date(t * 1000).toISOString().replace("T", " ").slice(0, 19) + " UTC";
+    }
+
+    function focusChartOnSignal(ev) {
+      if (!chartInstance || !ev || !ev.time) return;
+      const t = Number(ev.time);
+      const intv = $("chartInterval") ? $("chartInterval").value : "5m";
+      const secMap = { "1m": 60, "5m": 300, "15m": 900, "1h": 3600, "4h": 14400 };
+      const barSec = secMap[intv] || 300;
+      const span = barSec * 35;
+      try {
+        chartInstance.timeScale().setVisibleRange({
+          from: t - span,
+          to: t + span,
+        });
+      } catch (_) {}
+    }
+
+    function showSignalDetail(ev) {
+      if (!ev) return;
+      selectedSignalId = ev.id || null;
+      const title = $("signalDetailTitle");
+      const grid = $("signalDetailGrid");
+      const msgEl = $("signalDetailMsg");
+      const fullMsg = $("signalDetailFullMsg");
+      const act = (ev.action || "").toUpperCase();
+      const actLbl = act === "BUY" ? "AL (Long)" : act === "SELL" ? "SAT (Short)" : act;
+      const kindLbl = ev.kind === "ma_cross" ? "MA kesişimi (teorik)" : "Bot kaydı";
+      if (title) {
+        title.textContent =
+          (ev.symbol || "") +
+          " · " +
+          actLbl +
+          " · " +
+          kindLbl;
+      }
+      const cells = [
+        ["Zaman", formatSignalTime(ev)],
+        ["Parite", ev.symbol || "—"],
+        ["Mum aralığı", ev.interval || "—"],
+        ["Yön", actLbl],
+        ["Fiyat", ev.price != null ? fmtNum(ev.price, 6) : "—"],
+        [
+          "MA kısa (" + (ev.short_window || "?") + ")",
+          ev.ma_short != null ? fmtNum(ev.ma_short, 6) : "—",
+        ],
+        [
+          "MA uzun (" + (ev.long_window || "?") + ")",
+          ev.ma_long != null ? fmtNum(ev.ma_long, 6) : "—",
+        ],
+        ["Miktar", ev.quantity != null ? String(ev.quantity) : "—"],
+        ["Olay", ev.event_label || ev.event || "—"],
+        ["Durum", ev.status_label || ev.status || "—"],
+        ["Kaynak", ev.source || "—"],
+      ];
+      if (grid) {
+        grid.innerHTML = cells
+          .map(function (c) {
+            return (
+              '<div class="item"><div class="k">' +
+              c[0] +
+              '</div><div class="v">' +
+              c[1] +
+              "</div></div>"
+            );
+          })
+          .join("");
+      }
+      const summary = ev.summary || "";
+      const message = ev.message || "";
+      if (msgEl) {
+        msgEl.textContent = summary
+          ? "Özet: " + summary + (message ? "\n\nTam kayıt: " + message : "")
+          : message || "Ek mesaj yok.";
+      }
+      if (fullMsg && message.length > 120) {
+        fullMsg.style.display = "block";
+        fullMsg.textContent = message;
+      } else if (fullMsg) {
+        fullMsg.style.display = "none";
+      }
+      const hint = $("signalDetailHint");
+      if (hint) hint.textContent = "Grafikte ilgili muma yakınlaştırıldı. Başka satır için tabloya tıklayın.";
+      focusChartOnSignal(ev);
+      document.querySelectorAll("#chartSignalBody tr.signal-row").forEach(function (tr) {
+        tr.classList.toggle("active", tr.getAttribute("data-sid") === selectedSignalId);
+      });
+    }
+
+    function pickDefaultSignal(events) {
+      const bot = (events || []).find(function (e) { return e.kind === "bot"; });
+      return bot || (events && events[0]) || null;
+    }
+
+    function renderChartSignalTable(events) {
+      lastChartSignals = events || [];
+      const tbody = $("chartSignalBody");
+      const countEl = $("signalFilterCount");
+      const rows = filteredChartSignals();
+      if (countEl) {
+        countEl.textContent = rows.length + " / " + lastChartSignals.length + " kayıt";
+      }
+      if (!tbody) return;
+      if (!rows.length) {
+        tbody.innerHTML =
+          '<tr><td colspan="9" class="muted">Bu filtrede sinyal yok</td></tr>';
+        return;
+      }
+      tbody.innerHTML = rows
+        .map(function (ev) {
+          const kind = ev.kind === "ma_cross" ? "MA kesişim" : "Bot";
+          const kindCls = ev.kind === "ma_cross" ? "signal-kind-ma" : "signal-kind-bot";
+          const act = (ev.action || "").toUpperCase();
+          const actCls = act === "BUY" ? "side-long" : act === "SELL" ? "side-short" : "";
+          const actLbl = act === "BUY" ? "AL" : act === "SELL" ? "SAT" : act;
+          const sid = ev.id || "";
+          const active = sid && sid === selectedSignalId ? " active" : "";
+          return (
+            '<tr class="signal-row' +
+            active +
+            '" data-sid="' +
+            sid +
+            '"><td>' +
+            formatSignalTime(ev) +
+            '</td><td class="' +
+            kindCls +
+            '">' +
+            kind +
+            '</td><td class="' +
+            actCls +
+            '"><strong>' +
+            actLbl +
+            "</strong></td><td>" +
+            (ev.price != null ? fmtNum(ev.price, 6) : "—") +
+            "</td><td>" +
+            (ev.ma_short != null ? fmtNum(ev.ma_short, 6) : "—") +
+            "</td><td>" +
+            (ev.ma_long != null ? fmtNum(ev.ma_long, 6) : "—") +
+            "</td><td>" +
+            (ev.quantity != null ? ev.quantity : "—") +
+            "</td><td>" +
+            (ev.event_label || ev.event || "—") +
+            "</td><td>" +
+            (ev.status_label || ev.status || "—") +
+            "</td></tr>"
+          );
+        })
+        .join("");
+      tbody.querySelectorAll("tr.signal-row").forEach(function (tr) {
+        tr.addEventListener("click", function () {
+          const sid = tr.getAttribute("data-sid");
+          const ev = lastChartSignals.find(function (e) { return e.id === sid; });
+          if (ev) showSignalDetail(ev);
+        });
+      });
+      if (!selectedSignalId || !lastChartSignals.some(function (e) { return e.id === selectedSignalId; })) {
+        const def = pickDefaultSignal(rows);
+        if (def) showSignalDetail(def);
+      } else {
+        const cur = lastChartSignals.find(function (e) { return e.id === selectedSignalId; });
+        if (cur) showSignalDetail(cur);
+      }
+    }
+
+    function clearChartLines() {
+      if (!candleSeries || !chartPriceLines.length) return;
+      chartPriceLines.forEach(function (line) {
+        try { candleSeries.removePriceLine(line); } catch (_) {}
+      });
+      chartPriceLines = [];
+    }
+
+    async function refreshChart() {
+      const symbol = $("chartSymbol") ? $("chartSymbol").value : "BTCUSDT";
+      const interval = $("chartInterval") ? $("chartInterval").value : "5m";
+      const limit = $("chartLimit") ? $("chartLimit").value : "300";
+      const showMa = !$("chartShowMa") || $("chartShowMa").checked;
+      const showCrosses = !$("chartShowCrosses") || $("chartShowCrosses").checked;
+      const showBot = !$("chartShowBot") || $("chartShowBot").checked;
+      const showVolume = !$("chartShowVolume") || $("chartShowVolume").checked;
+      if (!$("chartContainer")) return;
+      if (typeof LightweightCharts === "undefined") {
+        $("chartMeta").textContent = "Grafik kütüphanesi yüklenemedi";
+        return;
+      }
+      initChart();
+      try {
+        const q =
+          "/api/dashboard/klines?symbol=" +
+          encodeURIComponent(symbol) +
+          "&interval=" +
+          encodeURIComponent(interval) +
+          "&limit=" +
+          encodeURIComponent(limit) +
+          "&include_ma=" +
+          (showMa ? "1" : "0") +
+          "&include_crosses=" +
+          (showCrosses ? "1" : "0") +
+          "&include_bot=" +
+          (showBot ? "1" : "0");
+        const data = await api(q);
+        const candles = data.candles || [];
+        if (candleSeries) {
+          candleSeries.setData(candles);
+          if (data.markers && data.markers.length) {
+            candleSeries.setMarkers(data.markers);
+          } else {
+            candleSeries.setMarkers([]);
+          }
+          clearChartLines();
+          if (data.entry_price) {
+            chartPriceLines.push(
+              candleSeries.createPriceLine({
+                price: parseFloat(data.entry_price),
+                color: "#6366f1",
+                lineWidth: 2,
+                title: "Giriş " + (data.position_side || ""),
+              })
+            );
+          }
+          if (data.mark_price) {
+            chartPriceLines.push(
+              candleSeries.createPriceLine({
+                price: parseFloat(data.mark_price),
+                color: "#22d3ee",
+                lineWidth: 1,
+                lineStyle: 2,
+                title: "Mark",
+              })
+            );
+          }
+        }
+        if (maShortSeries) {
+          maShortSeries.setData(showMa && data.ma_short ? data.ma_short : []);
+          maShortSeries.applyOptions({ visible: showMa });
+        }
+        if (maLongSeries) {
+          maLongSeries.setData(showMa && data.ma_long ? data.ma_long : []);
+          maLongSeries.applyOptions({ visible: showMa });
+        }
+        if (volumeSeries) {
+          const volData = candles.map(function (c) {
+            const v = c.volume != null ? parseFloat(c.volume) : 0;
+            const up = parseFloat(c.close) >= parseFloat(c.open);
+            return {
+              time: c.time,
+              value: v,
+              color: up ? "rgba(52, 211, 153, 0.45)" : "rgba(248, 113, 113, 0.45)",
+            };
+          });
+          volumeSeries.setData(showVolume ? volData : []);
+          volumeSeries.applyOptions({ visible: showVolume });
+        }
+        if (chartInstance) chartInstance.timeScale().fitContent();
+        renderChartStats(data);
+        renderChartSignalTable(data.signal_events || []);
+        const meta = $("chartMeta");
+        if (meta) {
+          meta.textContent =
+            symbol +
+            " · " +
+            interval +
+            " · MA " +
+            (data.short_window || "?") +
+            "/" +
+            (data.long_window || "?") +
+            " · " +
+            candles.length +
+            " mum · " +
+            (data.marker_count || 0) +
+            " işaret · " +
+            new Date().toLocaleTimeString("tr-TR");
+        }
+      } catch (e) {
+        if ($("chartMeta")) $("chartMeta").textContent = String(e);
+      }
+    }
+
+    function startChartPoll() {
+      refreshChart();
+      if (chartTimer) clearInterval(chartTimer);
+      const auto = $("chartAutoRefresh");
+      if (auto && !auto.checked) return;
+      chartTimer = setInterval(refreshChart, 5000);
     }
 
     async function refreshStatus() {
       const statusMsg = $("statusMsg");
-      const statusBox = $("statusBox");
       statusMsg.textContent = "yükleniyor…";
       statusMsg.className = "";
       try {
         const data = await api("/api/dashboard/status");
         lastStatus = data;
-        statusBox.textContent = JSON.stringify(data, null, 2);
-        renderCards(data);
-        statusMsg.textContent = "güncel";
-        statusMsg.className = "ok";
-        $("lastSync").textContent = "Son: " + new Date().toLocaleString();
+        $("statusBox").textContent = JSON.stringify(data, null, 2);
+        renderStatusStrip(data);
+        renderOverviewConfig(data);
+        renderOverviewConnection(data);
+        renderOverviewHero(lastPositions, data);
+        populateChartSymbols();
+        const chartInt = $("chartInterval");
+        if (chartInt && data.kline_interval) {
+          const opt = chartInt.querySelector('option[value="' + data.kline_interval + '"]');
+          if (opt) chartInt.value = data.kline_interval;
+        }
+        statusMsg.textContent = "Canlı";
+        const badge = $("syncBadge");
+        if (badge) badge.classList.add("ok");
+        const ls = $("lastSync");
+        if (ls) ls.textContent = new Date().toLocaleString("tr-TR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
       } catch (e) {
-        statusMsg.textContent = "hata";
+        statusMsg.textContent = String(e);
         statusMsg.className = "err";
-        $("cards").innerHTML = '<div class="card"><div class="k">Hata</div><div class="v err">' + String(e) + "</div></div>";
+        if (String(e).includes("401") || String(e).includes("unauthorized")) {
+          sessionStorage.removeItem(tokenKey);
+          $("loginScreen").style.display = "grid";
+          $("app").classList.remove("ready");
+          toast("Geçersiz token — tekrar giriş yapın", true);
+        }
       }
     }
 
-    $("btnToggleRaw").addEventListener("click", () => {
-      const pre = $("statusBox");
-      pre.hidden = !pre.hidden;
-    });
-
     async function loadOverridesTextarea() {
+      if (!getToken()) return;
       const mapMsg = $("mapMsg");
       mapMsg.textContent = "yükleniyor…";
-      mapMsg.className = "";
       try {
         const data = await api("/api/dashboard/overrides");
         $("qty").value = JSON.stringify(data.symbol_qty_map || {}, null, 2);
-        mapMsg.textContent = "runtime dosyası yüklendi";
+        mapMsg.textContent = "runtime yüklendi";
         mapMsg.className = "ok";
       } catch (e) {
         mapMsg.textContent = String(e);
@@ -368,76 +2599,57 @@
       }
     }
 
-    $("btnFillMerged").addEventListener("click", async () => {
-      const mapMsg = $("mapMsg");
-      try {
-        if (!lastStatus) await refreshStatus();
-        const m = (lastStatus && lastStatus.symbol_qty_merged) || {};
-        $("qty").value = JSON.stringify(m, null, 2);
-        mapMsg.textContent = "Birleşik harita textarea’ya alındı. Kaydedersen tamamı runtime’a yazılır.";
-        mapMsg.className = "warn";
-      } catch (e) {
-        mapMsg.textContent = String(e);
-        mapMsg.className = "err";
+    const posAuto = $("posAutoRefresh");
+    if (posAuto) {
+      posAuto.addEventListener("change", function () {
+        if (this.checked) startPosPoll();
+        else stopPosPoll();
+      });
+    }
+    const chartAuto = $("chartAutoRefresh");
+    if (chartAuto) {
+      chartAuto.addEventListener("change", function () {
+        if (this.checked) startChartPoll();
+        else stopChartPoll();
+      });
+    }
+    const chartSym = $("chartSymbol");
+    const chartInt = $("chartInterval");
+    if (chartSym) chartSym.addEventListener("change", startChartPoll);
+    if (chartInt) chartInt.addEventListener("change", startChartPoll);
+    ["chartShowMa", "chartShowCrosses", "chartShowBot", "chartShowVolume", "chartLimit"].forEach(
+      function (id) {
+        const el = $(id);
+        if (el) el.addEventListener("change", refreshChart);
       }
+    );
+    document.querySelectorAll("[data-signal-filter]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        document.querySelectorAll("[data-signal-filter]").forEach(function (b) {
+          b.classList.remove("active");
+        });
+        btn.classList.add("active");
+        chartSignalFilter = btn.getAttribute("data-signal-filter") || "all";
+        renderChartSignalTable(lastChartSignals);
+      });
     });
 
-    $("btnFormat").addEventListener("click", () => {
-      const mapMsg = $("mapMsg");
-      try {
-        const obj = JSON.parse($("qty").value || "{}");
-        $("qty").value = JSON.stringify(obj, null, 2);
-        mapMsg.textContent = "JSON biçimlendi";
-        mapMsg.className = "ok";
-      } catch (e) {
-        mapMsg.textContent = String(e);
-        mapMsg.className = "err";
-      }
-    });
+    const goAct = $("overviewGoActivity");
+    if (goAct) {
+      goAct.addEventListener("click", function (e) {
+        e.preventDefault();
+        const btn = document.querySelector('.nav-item[data-view="activity"]');
+        if (btn) btn.click();
+      });
+    }
 
-    $("btnRefresh").addEventListener("click", refreshStatus);
-    $("btnReloadMap").addEventListener("click", loadOverridesTextarea);
-
-    $("btnSave").addEventListener("click", async () => {
-      const mapMsg = $("mapMsg");
-      mapMsg.textContent = "kaydediliyor…";
-      mapMsg.className = "";
-      try {
-        const obj = JSON.parse($("qty").value || "{}");
-        if (typeof obj !== "object" || obj === null || Array.isArray(obj)) throw new Error("JSON kökü nesne olmalı");
-        const norm = {};
-        for (const [k, v] of Object.entries(obj)) norm[String(k).toUpperCase()] = Number(v);
-        await api("/api/dashboard/overrides", { method: "PUT", body: JSON.stringify({ symbol_qty_map: norm }) });
-        mapMsg.textContent = "Kaydedildi";
-        mapMsg.className = "ok";
-        toast("Runtime miktar haritası güncellendi", false);
-        await refreshStatus();
-      } catch (e) {
-        mapMsg.textContent = String(e);
-        mapMsg.className = "err";
-        toast(String(e), true);
-      }
-    });
-
-    $("btnClear").addEventListener("click", async () => {
-      const mapMsg = $("mapMsg");
-      mapMsg.textContent = "sıfırlanıyor…";
-      mapMsg.className = "";
-      try {
-        await api("/api/dashboard/overrides", { method: "DELETE" });
-        $("qty").value = "{}";
-        mapMsg.textContent = "Runtime sıfırlandı (.env aynı)";
-        mapMsg.className = "ok";
-        toast("Runtime temizlendi", false);
-        await refreshStatus();
-      } catch (e) {
-        mapMsg.textContent = String(e);
-        mapMsg.className = "err";
-      }
-    });
-
-    refreshStatus();
-    loadOverridesTextarea();
+    const appEl = $("app");
+    if (appEl && appEl.classList.contains("ready")) {
+      refreshOverview();
+      loadOverridesTextarea();
+      loadStrategy();
+      startPosPoll();
+    }
   </script>
 </body>
 </html>
