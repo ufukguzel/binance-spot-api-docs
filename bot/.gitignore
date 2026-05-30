@@ -1,0 +1,6 @@
+.vercel
+__pycache__/
+*.pyc
+.env
+runtime_overrides.json
+activity.jsonl
